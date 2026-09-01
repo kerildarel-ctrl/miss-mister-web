@@ -32,7 +32,7 @@ export default function HomePage() {
     <>
       <Header />
 
-      <main className="flex-1 overflow-hidden font-poppins">
+      <main className="flex-1 overflow-hidden font-poppins bg-[#0B0E14] text-white">
         
         {/* ========================================================================= */}
         {/* FIRST SCREEN (HERO): PURE PRESTIGE BRANDING WITH CREATE EVENT CTA BUTTON */}
@@ -40,8 +40,7 @@ export default function HomePage() {
         <section className="relative min-h-[85vh] flex flex-col justify-center items-center text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden py-16">
           
           {/* Ambient Glowing Background Orbs */}
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ambient-orb-gold opacity-60 rounded-full blur-[140px] pointer-events-none" />
-          <div className="absolute top-1/3 left-1/4 w-[450px] h-[450px] ambient-orb-pink opacity-40 rounded-full blur-[120px] pointer-events-none" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ambient-orb-gold opacity-50 rounded-full blur-[140px] pointer-events-none" />
 
           <div className="relative z-10 max-w-4xl mx-auto space-y-8">
             
@@ -49,10 +48,10 @@ export default function HomePage() {
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white backdrop-blur-md border border-amber-300/80 shadow-md text-slate-900 text-xs font-black uppercase tracking-widest mx-auto"
+              className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-[#131A26]/90 backdrop-blur-md border border-amber-500/30 shadow-lg text-white text-xs font-black uppercase tracking-widest mx-auto"
             >
-              <Crown className="w-4 h-4 text-amber-500 fill-amber-400 animate-bounce" />
-              <span className="text-amber-800">LA PLATEFORME OFFICIELLE DE VOTE EN LIGNE</span>
+              <Crown className="w-4 h-4 text-amber-400 fill-amber-400 animate-bounce" />
+              <span className="text-amber-300">LA PLATEFORME OFFICIELLE DE VOTE EN LIGNE</span>
             </motion.div>
 
             {/* Giant Title */}
@@ -62,12 +61,12 @@ export default function HomePage() {
               transition={{ delay: 0.1 }}
               className="space-y-3"
             >
-              <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-none text-slate-950">
-                <span className="text-pink-600">MISS </span>
+              <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-none text-white drop-shadow-md">
+                <span>MISS </span>
                 <span className="gradient-text-gold">MISTER</span>
               </h1>
               
-              <p className="text-xl sm:text-2xl font-black text-slate-900 tracking-wide uppercase">
+              <p className="text-xl sm:text-2xl font-black text-slate-200 tracking-wide uppercase">
                 Votre vote, votre choix, <span className="gradient-text-gold">votre champion</span>.
               </p>
             </motion.div>
@@ -77,7 +76,7 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-base sm:text-lg text-slate-800 max-w-2xl mx-auto leading-relaxed font-semibold"
+              className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium"
             >
               Découvrez les leaders de demain, soutenez l&apos;excellence et faites entendre votre voix en direct grâce aux paiements sécurisés Mobile Money.
             </motion.p>
@@ -89,14 +88,14 @@ export default function HomePage() {
               transition={{ delay: 0.3 }}
               className="max-w-xl mx-auto pt-2"
             >
-              <div className="relative flex items-center bg-white p-2 rounded-2xl border border-amber-300 shadow-xl">
-                <Search className="w-5 h-5 text-slate-500 ml-3 flex-shrink-0" />
+              <div className="relative flex items-center bg-[#131A26]/90 backdrop-blur-md p-2 rounded-2xl border border-amber-500/30 shadow-2xl">
+                <Search className="w-5 h-5 text-amber-400 ml-3 flex-shrink-0" />
                 <input
                   type="text"
                   placeholder="Rechercher une compétition ou un candidat..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-3 py-2 bg-transparent text-slate-950 text-xs sm:text-sm font-bold placeholder-slate-500 focus:outline-none"
+                  className="w-full px-3 py-2 bg-transparent text-white text-xs sm:text-sm font-bold placeholder-slate-400 focus:outline-none"
                 />
                 <Link
                   href={searchQuery ? `/competitions?search=${encodeURIComponent(searchQuery)}` : '/competitions'}
@@ -108,7 +107,7 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* CTA ACTION BUTTONS: WITH EVENT CREATION MODAL TRIGGER */}
+            {/* CTA ACTION BUTTONS */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -118,7 +117,7 @@ export default function HomePage() {
               {/* HIGH-VISIBILITY BUTTON: CRÉER MON ÉVÉNEMENT */}
               <button
                 onClick={() => setIsEventModalOpen(true)}
-                className="gold-gradient-btn py-4 px-8 rounded-2xl text-sm font-black uppercase tracking-wider text-slate-950 flex items-center gap-2.5 shadow-2xl hover:scale-105 transition-transform border-2 border-amber-400"
+                className="gold-gradient-btn py-4 px-8 rounded-2xl text-sm font-black uppercase tracking-wider text-slate-950 flex items-center gap-2.5 shadow-2xl hover:scale-105 transition-transform border border-amber-300"
               >
                 <PlusCircle className="w-6 h-6 text-slate-950" />
                 <span>CRÉER MON ÉVÉNEMENT</span>
@@ -126,17 +125,17 @@ export default function HomePage() {
 
               <Link
                 href="/competitions"
-                className="py-4 px-8 rounded-2xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-900 text-sm font-black uppercase tracking-wider flex items-center gap-2 shadow-xl hover:scale-105 transition-transform"
+                className="py-4 px-8 rounded-2xl bg-[#131A26] border border-amber-500/30 hover:border-amber-400 text-white text-sm font-black uppercase tracking-wider flex items-center gap-2 shadow-xl hover:scale-105 transition-transform"
               >
-                <Trophy className="w-5 h-5 text-amber-600" />
+                <Trophy className="w-5 h-5 text-amber-400" />
                 <span>Voir les Compétitions</span>
               </Link>
 
               <Link
                 href="/classement"
-                className="py-4 px-8 rounded-2xl bg-white border border-amber-300 text-slate-900 hover:bg-amber-50 text-sm font-black uppercase tracking-wider flex items-center gap-2 shadow-md transition-colors"
+                className="py-4 px-8 rounded-2xl bg-[#131A26] border border-amber-500/30 text-white hover:bg-slate-800 text-sm font-black uppercase tracking-wider flex items-center gap-2 shadow-md transition-colors"
               >
-                <Crown className="w-5 h-5 text-amber-500 fill-amber-400" />
+                <Crown className="w-5 h-5 text-amber-400 fill-amber-400" />
                 <span>Classement</span>
               </Link>
             </motion.div>
@@ -148,27 +147,27 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="w-full max-w-5xl mx-auto mt-16 bg-white rounded-3xl p-6 border border-amber-300 shadow-xl grid grid-cols-2 md:grid-cols-4 gap-6 text-center"
+            className="w-full max-w-5xl mx-auto mt-16 bg-[#131A26]/90 backdrop-blur-xl rounded-3xl p-6 border border-amber-500/30 shadow-2xl grid grid-cols-2 md:grid-cols-4 gap-6 text-center"
           >
             <div className="space-y-1">
-              <p className="text-xs font-black text-slate-600 uppercase tracking-wider">Compétitions</p>
-              <p className="text-3xl font-black text-blue-700 font-mono">{competitions.length || 0}</p>
+              <p className="text-xs font-black text-slate-400 uppercase tracking-wider">Compétitions</p>
+              <p className="text-3xl font-black text-amber-400 font-mono">{competitions.length || 0}</p>
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs font-black text-slate-600 uppercase tracking-wider">Candidats</p>
-              <p className="text-3xl font-black text-pink-700 font-mono">{candidates.length || 0}</p>
+              <p className="text-xs font-black text-slate-400 uppercase tracking-wider">Candidats</p>
+              <p className="text-3xl font-black text-amber-400 font-mono">{candidates.length || 0}</p>
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs font-black text-slate-600 uppercase tracking-wider">Total Suffrages</p>
-              <p className="text-3xl font-black text-amber-600 font-mono">{totalVotes.toLocaleString('fr-FR')} votes</p>
+              <p className="text-xs font-black text-slate-400 uppercase tracking-wider">Total Suffrages</p>
+              <p className="text-3xl font-black text-amber-400 font-mono">{totalVotes.toLocaleString('fr-FR')} votes</p>
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs font-black text-slate-600 uppercase tracking-wider">Débit Sécurisé</p>
-              <p className="text-xs font-black text-emerald-700 uppercase flex items-center justify-center gap-1 mt-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" /> Mobile Money 100% Sécurisé
+              <p className="text-xs font-black text-slate-400 uppercase tracking-wider">Débit Sécurisé</p>
+              <p className="text-xs font-black text-emerald-400 uppercase flex items-center justify-center gap-1 mt-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" /> Mobile Money 100% Sécurisé
               </p>
             </div>
           </motion.div>
@@ -181,14 +180,14 @@ export default function HomePage() {
         <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-16">
           
           <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 border border-amber-300 text-xs font-black text-amber-800 uppercase tracking-widest">
-              <Zap className="w-4 h-4 text-amber-600" />
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#131A26] border border-amber-500/30 text-xs font-black text-amber-400 uppercase tracking-widest">
+              <Zap className="w-4 h-4 text-amber-400" />
               <span>SIMPLE, RAPIDE ET TRANSPARENT</span>
             </div>
-            <h2 className="text-3xl sm:text-5xl font-black text-slate-950 tracking-tight">
+            <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
               COMMENT ÇA <span className="gradient-text-gold">MARCHE ?</span>
             </h2>
-            <p className="text-sm font-semibold text-slate-700">
+            <p className="text-sm font-semibold text-slate-300">
               Soutenez vos candidats favoris en 4 étapes simples et sécurisées.
             </p>
           </div>
@@ -196,57 +195,57 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
             {/* Step 1 */}
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-md hover:shadow-xl hover:border-amber-400 transition-all duration-300 space-y-4 text-center group">
-              <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-sm border border-amber-200">
+            <div className="bg-[#131A26]/90 backdrop-blur-xl p-8 rounded-3xl border border-amber-500/20 shadow-xl hover:border-amber-400 transition-all duration-300 space-y-4 text-center group">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-sm border border-amber-500/20">
                 <Trophy className="w-8 h-8" />
               </div>
-              <span className="inline-block text-xs font-black text-amber-800 font-mono bg-amber-50 px-3 py-1 rounded-full border border-amber-300">
+              <span className="inline-block text-xs font-black text-amber-400 font-mono bg-[#0B0E14] px-3 py-1 rounded-full border border-amber-500/20">
                 ÉTAPE 01
               </span>
-              <h3 className="text-lg font-black text-slate-950">Parcourez</h3>
-              <p className="text-xs font-semibold text-slate-600 leading-relaxed">
+              <h3 className="text-lg font-black text-white">Parcourez</h3>
+              <p className="text-xs font-medium text-slate-300 leading-relaxed">
                 Explorez le catalogue des compétitions officielles et choisissez celle de votre établissement ou région.
               </p>
             </div>
 
             {/* Step 2 */}
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-md hover:shadow-xl hover:border-amber-400 transition-all duration-300 space-y-4 text-center group">
-              <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-700 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-sm">
+            <div className="bg-[#131A26]/90 backdrop-blur-xl p-8 rounded-3xl border border-amber-500/20 shadow-xl hover:border-amber-400 transition-all duration-300 space-y-4 text-center group">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-sm border border-amber-500/20">
                 <Users className="w-8 h-8" />
               </div>
-              <span className="inline-block text-xs font-black text-blue-800 font-mono bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+              <span className="inline-block text-xs font-black text-amber-400 font-mono bg-[#0B0E14] px-3 py-1 rounded-full border border-amber-500/20">
                 ÉTAPE 02
               </span>
-              <h3 className="text-lg font-black text-slate-950">Sélectionnez</h3>
-              <p className="text-xs font-semibold text-slate-600 leading-relaxed">
+              <h3 className="text-lg font-black text-white">Sélectionnez</h3>
+              <p className="text-xs font-medium text-slate-300 leading-relaxed">
                 Consultez les profils, les biographies et les photos des candidats en lice.
               </p>
             </div>
 
             {/* Step 3 */}
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-md hover:shadow-xl hover:border-amber-400 transition-all duration-300 space-y-4 text-center group">
-              <div className="w-16 h-16 rounded-2xl bg-purple-50 text-purple-700 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-sm">
+            <div className="bg-[#131A26]/90 backdrop-blur-xl p-8 rounded-3xl border border-amber-500/20 shadow-xl hover:border-amber-400 transition-all duration-300 space-y-4 text-center group">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-sm border border-amber-500/20">
                 <Vote className="w-8 h-8" />
               </div>
-              <span className="inline-block text-xs font-black text-purple-800 font-mono bg-purple-50 px-3 py-1 rounded-full border border-purple-200">
+              <span className="inline-block text-xs font-black text-amber-400 font-mono bg-[#0B0E14] px-3 py-1 rounded-full border border-amber-500/20">
                 ÉTAPE 03
               </span>
-              <h3 className="text-lg font-black text-slate-950">Payez par Mobile</h3>
-              <p className="text-xs font-semibold text-slate-600 leading-relaxed">
+              <h3 className="text-lg font-black text-white">Payez par Mobile</h3>
+              <p className="text-xs font-medium text-slate-300 leading-relaxed">
                 Réglez en toute sécurité via Orange Money ou MTN Mobile Money.
               </p>
             </div>
 
             {/* Step 4 */}
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-md hover:shadow-xl hover:border-amber-400 transition-all duration-300 space-y-4 text-center group">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-sm">
-                <Crown className="w-8 h-8 text-amber-500" />
+            <div className="bg-[#131A26]/90 backdrop-blur-xl p-8 rounded-3xl border border-amber-500/20 shadow-xl hover:border-amber-400 transition-all duration-300 space-y-4 text-center group">
+              <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform shadow-sm border border-amber-500/20">
+                <Crown className="w-8 h-8 text-amber-400" />
               </div>
-              <span className="inline-block text-xs font-black text-emerald-800 font-mono bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+              <span className="inline-block text-xs font-black text-amber-400 font-mono bg-[#0B0E14] px-3 py-1 rounded-full border border-amber-500/20">
                 ÉTAPE 04
               </span>
-              <h3 className="text-lg font-black text-slate-950">Suivez en Direct</h3>
-              <p className="text-xs font-semibold text-slate-600 leading-relaxed">
+              <h3 className="text-lg font-black text-white">Suivez en Direct</h3>
+              <p className="text-xs font-medium text-slate-300 leading-relaxed">
                 Votre vote est décompté et ajouté au score du candidat instantanément !
               </p>
             </div>
@@ -259,7 +258,7 @@ export default function HomePage() {
         {/* THIRD SECTION: SECURITY BANNER */}
         {/* ========================================================================= */}
         <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <div className="bg-slate-900 rounded-3xl p-8 sm:p-14 text-white shadow-2xl relative overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border border-amber-500/20">
+          <div className="bg-[#131A26] rounded-3xl p-8 sm:p-14 text-white shadow-2xl relative overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border border-amber-500/30">
             
             {/* Ambient background blur */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-[100px] pointer-events-none" />
@@ -274,7 +273,7 @@ export default function HomePage() {
                 Vous souhaitez organiser votre propre élection ?
               </h3>
 
-              <p className="text-slate-200 text-sm sm:text-base leading-relaxed max-w-2xl font-normal">
+              <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-2xl font-normal">
                 Soumettez votre demande d&apos;événement en ligne pour créer votre compétition personnalisée et recevoir vos paiements directement par Mobile Money.
               </p>
 
@@ -291,7 +290,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="lg:col-span-4 relative z-10 flex flex-col items-center justify-center space-y-4 text-center bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-amber-500/20">
+            <div className="lg:col-span-4 relative z-10 flex flex-col items-center justify-center space-y-4 text-center bg-[#0B0E14]/80 backdrop-blur-md p-6 rounded-2xl border border-amber-500/30">
               <Flame className="w-10 h-10 text-amber-400 animate-pulse" />
               <h4 className="text-xl font-extrabold text-white">Créez votre élection dès aujourd&apos;hui</h4>
               <button
