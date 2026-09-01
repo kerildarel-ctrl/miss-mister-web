@@ -6,7 +6,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { getCompetitions, getCandidates } from '@/services/dbService';
 import { Competition, Candidate } from '@/data/mockData';
-import { Crown, Trophy, Users, Vote, Search, ShieldCheck, ArrowRight, Zap, CheckCircle, Flame } from 'lucide-react';
+import { Crown, Trophy, Users, Vote, Search, ShieldCheck, ArrowRight, Zap, CheckCircle, Flame, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function HomePage() {
@@ -26,6 +26,8 @@ export default function HomePage() {
 
   const totalVotes = candidates.reduce((sum, c) => sum + c.voteCount, 0);
 
+  const whatsappLink = "https://wa.me/237692886326?text=Bonjour%20MISS%20MISTER,%20je%20souhaite%20cr%C3%A9er%20mon%20%C3%A9v%C3%A9nement%20de%20vote%20en%20ligne.";
+
   return (
     <>
       <Header />
@@ -33,11 +35,11 @@ export default function HomePage() {
       <main className="flex-1 overflow-hidden font-poppins">
         
         {/* ========================================================================= */}
-        {/* FIRST SCREEN (HERO): HIGH CONTRAST & CLEAR READABILITY */}
+        {/* FIRST SCREEN (HERO): PURE PRESTIGE BRANDING WITH WHATSAPP CTA BUTTON */}
         {/* ========================================================================= */}
         <section className="relative min-h-[85vh] flex flex-col justify-center items-center text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden py-16">
           
-          {/* Ambient Background Glow */}
+          {/* Ambient Glowing Background Orbs */}
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ambient-orb-gold opacity-60 rounded-full blur-[140px] pointer-events-none" />
           <div className="absolute top-1/3 left-1/4 w-[450px] h-[450px] ambient-orb-pink opacity-40 rounded-full blur-[120px] pointer-events-none" />
 
@@ -53,7 +55,7 @@ export default function HomePage() {
               <span className="text-amber-800">LA PLATEFORME OFFICIELLE DE VOTE EN LIGNE</span>
             </motion.div>
 
-            {/* Giant Title with Sharp High Contrast */}
+            {/* Giant Title */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
@@ -70,7 +72,7 @@ export default function HomePage() {
               </p>
             </motion.div>
 
-            {/* Subtitle with High Contrast Text */}
+            {/* Subtitle */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -106,19 +108,30 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* CTA Action Buttons */}
+            {/* CTA ACTION BUTTONS: WITH PROMINENT WHATSAPP "CRÉER MON ÉVÉNEMENT" BUTTON */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="flex flex-wrap items-center justify-center gap-4 pt-4"
             >
+              {/* HIGH-VISIBILITY WHATSAPP BUTTON: CRÉER MON ÉVÉNEMENT */}
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-4 px-8 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-black uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 transition-transform border-2 border-emerald-400/80 animate-pulse"
+              >
+                <MessageCircle className="w-6 h-6 text-white fill-white" />
+                <span>CRÉER MON ÉVÉNEMENT (WHATSAPP)</span>
+              </a>
+
               <Link
                 href="/competitions"
                 className="gold-gradient-btn py-4 px-8 rounded-2xl text-sm font-black text-slate-950 uppercase tracking-wider flex items-center gap-2 shadow-xl hover:scale-105 transition-transform"
               >
                 <Trophy className="w-5 h-5 text-slate-950" />
-                <span>Voir les Compétitions Officielle</span>
+                <span>Voir les Compétitions</span>
               </Link>
 
               <Link
@@ -126,7 +139,7 @@ export default function HomePage() {
                 className="py-4 px-8 rounded-2xl bg-white border border-amber-300 text-slate-900 hover:bg-amber-50 text-sm font-black uppercase tracking-wider flex items-center gap-2 shadow-md transition-colors"
               >
                 <Crown className="w-5 h-5 text-amber-500 fill-amber-400" />
-                <span>Consulter le Classement</span>
+                <span>Classement</span>
               </Link>
             </motion.div>
 
@@ -245,7 +258,7 @@ export default function HomePage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* THIRD SECTION: SECURITY BANNER */}
+        {/* THIRD SECTION: SECURITY BANNER WITH SECOND WHATSAPP CTA */}
         {/* ========================================================================= */}
         <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <div className="bg-slate-900 rounded-3xl p-8 sm:p-14 text-white shadow-2xl relative overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border border-amber-500/20">
@@ -260,19 +273,19 @@ export default function HomePage() {
               </div>
 
               <h3 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight text-white">
-                Une transparence totale pour chaque vote.
+                Vous souhaitez organiser votre propre élection ?
               </h3>
 
               <p className="text-slate-200 text-sm sm:text-base leading-relaxed max-w-2xl font-normal">
-                Chaque suffrage est vérifié par confirmation bancaire Mobile Money. Les votes ne sont comptabilisés que si le compte est débité avec succès, garantissant une équité parfaite.
+                Contactez-nous directement sur WhatsApp pour créer votre compétition personnalisée et recevoir vos paiements directement par Mobile Money.
               </p>
 
               <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-slate-200">
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" /> API Fapshi Officielle
+                  <CheckCircle className="w-4 h-4 text-emerald-400" /> Configuration Rapide
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" /> Sauvegarde Supabase
+                  <CheckCircle className="w-4 h-4 text-emerald-400" /> API Fapshi Officielle
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle className="w-4 h-4 text-emerald-400" /> Support 24/7
@@ -282,13 +295,16 @@ export default function HomePage() {
 
             <div className="lg:col-span-4 relative z-10 flex flex-col items-center justify-center space-y-4 text-center bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-amber-500/20">
               <Flame className="w-10 h-10 text-amber-400 animate-pulse" />
-              <h4 className="text-xl font-extrabold text-white">Prêt à soutenir votre favori ?</h4>
-              <Link
-                href="/competitions"
-                className="w-full gold-gradient-btn py-3.5 px-6 rounded-xl font-black text-xs uppercase tracking-wider text-slate-950 shadow-lg text-center"
+              <h4 className="text-xl font-extrabold text-white">Créez votre élection dès aujourd&apos;hui</h4>
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full bg-emerald-600 hover:bg-emerald-500 py-3.5 px-6 rounded-xl font-black text-xs uppercase tracking-wider text-white shadow-xl text-center flex items-center justify-center gap-2"
               >
-                Accéder aux compétitions
-              </Link>
+                <MessageCircle className="w-5 h-5 text-white fill-white" />
+                <span>WhatsApp +237692886326</span>
+              </a>
             </div>
 
           </div>
