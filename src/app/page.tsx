@@ -4,15 +4,17 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
+import { CreateEventModal } from '@/components/CreateEventModal';
 import { getCompetitions, getCandidates } from '@/services/dbService';
 import { Competition, Candidate } from '@/data/mockData';
-import { Crown, Trophy, Users, Vote, Search, ShieldCheck, ArrowRight, Zap, CheckCircle, Flame, MessageCircle } from 'lucide-react';
+import { Crown, Trophy, Users, Vote, Search, ShieldCheck, ArrowRight, Zap, CheckCircle, Flame, PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function HomePage() {
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -26,8 +28,6 @@ export default function HomePage() {
 
   const totalVotes = candidates.reduce((sum, c) => sum + c.voteCount, 0);
 
-  const whatsappLink = "https://wa.me/237692886326?text=Bonjour%20MISS%20MISTER,%20je%20souhaite%20cr%C3%A9er%20mon%20%C3%A9v%C3%A9nement%20de%20vote%20en%20ligne.";
-
   return (
     <>
       <Header />
@@ -35,7 +35,7 @@ export default function HomePage() {
       <main className="flex-1 overflow-hidden font-poppins">
         
         {/* ========================================================================= */}
-        {/* FIRST SCREEN (HERO): PURE PRESTIGE BRANDING WITH WHATSAPP CTA BUTTON */}
+        {/* FIRST SCREEN (HERO): PURE PRESTIGE BRANDING WITH CREATE EVENT CTA BUTTON */}
         {/* ========================================================================= */}
         <section className="relative min-h-[85vh] flex flex-col justify-center items-center text-center px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden py-16">
           
@@ -108,29 +108,27 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* CTA ACTION BUTTONS: WITH PROMINENT WHATSAPP "CRÉER MON ÉVÉNEMENT" BUTTON */}
+            {/* CTA ACTION BUTTONS: WITH EVENT CREATION MODAL TRIGGER */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="flex flex-wrap items-center justify-center gap-4 pt-4"
             >
-              {/* HIGH-VISIBILITY WHATSAPP BUTTON: CRÉER MON ÉVÉNEMENT */}
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-4 px-8 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-black uppercase tracking-wider flex items-center gap-2.5 shadow-2xl hover:scale-105 transition-transform border-2 border-emerald-400/80 animate-pulse"
+              {/* HIGH-VISIBILITY BUTTON: CRÉER MON ÉVÉNEMENT (OPENS FORM MODAL) */}
+              <button
+                onClick={() => setIsEventModalOpen(true)}
+                className="gold-gradient-btn py-4 px-8 rounded-2xl text-sm font-black uppercase tracking-wider text-slate-950 flex items-center gap-2.5 shadow-2xl hover:scale-105 transition-transform border-2 border-amber-400"
               >
-                <MessageCircle className="w-6 h-6 text-white fill-white" />
-                <span>CRÉER MON ÉVÉNEMENT (WHATSAPP)</span>
-              </a>
+                <PlusCircle className="w-6 h-6 text-slate-950" />
+                <span>CRÉER MON ÉVÉNEMENT</span>
+              </button>
 
               <Link
                 href="/competitions"
-                className="gold-gradient-btn py-4 px-8 rounded-2xl text-sm font-black text-slate-950 uppercase tracking-wider flex items-center gap-2 shadow-xl hover:scale-105 transition-transform"
+                className="py-4 px-8 rounded-2xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-900 text-sm font-black uppercase tracking-wider flex items-center gap-2 shadow-xl hover:scale-105 transition-transform"
               >
-                <Trophy className="w-5 h-5 text-slate-950" />
+                <Trophy className="w-5 h-5 text-amber-600" />
                 <span>Voir les Compétitions</span>
               </Link>
 
@@ -258,7 +256,7 @@ export default function HomePage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* THIRD SECTION: SECURITY BANNER WITH SECOND WHATSAPP CTA */}
+        {/* THIRD SECTION: SECURITY BANNER WITH SECOND EVENT CREATION CTA */}
         {/* ========================================================================= */}
         <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <div className="bg-slate-900 rounded-3xl p-8 sm:p-14 text-white shadow-2xl relative overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border border-amber-500/20">
@@ -277,7 +275,7 @@ export default function HomePage() {
               </h3>
 
               <p className="text-slate-200 text-sm sm:text-base leading-relaxed max-w-2xl font-normal">
-                Contactez-nous directement sur WhatsApp pour créer votre compétition personnalisée et recevoir vos paiements directement par Mobile Money.
+                Soumettez votre demande d&apos;événement en ligne pour créer votre compétition personnalisée et recevoir vos paiements directement par Mobile Money.
               </p>
 
               <div className="pt-2 flex flex-wrap gap-4 text-xs font-bold text-slate-200">
@@ -296,21 +294,25 @@ export default function HomePage() {
             <div className="lg:col-span-4 relative z-10 flex flex-col items-center justify-center space-y-4 text-center bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-amber-500/20">
               <Flame className="w-10 h-10 text-amber-400 animate-pulse" />
               <h4 className="text-xl font-extrabold text-white">Créez votre élection dès aujourd&apos;hui</h4>
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full bg-emerald-600 hover:bg-emerald-500 py-3.5 px-6 rounded-xl font-black text-xs uppercase tracking-wider text-white shadow-xl text-center flex items-center justify-center gap-2"
+              <button
+                onClick={() => setIsEventModalOpen(true)}
+                className="w-full gold-gradient-btn py-3.5 px-6 rounded-xl font-black text-xs uppercase tracking-wider text-slate-950 shadow-xl text-center flex items-center justify-center gap-2"
               >
-                <MessageCircle className="w-5 h-5 text-white fill-white" />
-                <span>WhatsApp +237692886326</span>
-              </a>
+                <PlusCircle className="w-5 h-5 text-slate-950" />
+                <span>CRÉER MON ÉVÉNEMENT</span>
+              </button>
             </div>
 
           </div>
         </section>
 
       </main>
+
+      {/* EVENT CREATION FORM MODAL */}
+      <CreateEventModal
+        isOpen={isEventModalOpen}
+        onClose={() => setIsEventModalOpen(false)}
+      />
 
       <Footer />
     </>
