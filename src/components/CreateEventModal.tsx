@@ -107,7 +107,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ isOpen, onCl
                 </h3>
 
                 <p className="text-xs sm:text-sm font-semibold text-slate-600">
-                  Transmet instantanément la demande à l&apos;Espace Admin &amp; sur WhatsApp (+237 692 88 63 26).
+                  Remplissez ce formulaire pour soumettre votre demande d&apos;élection en ligne.
                 </p>
               </div>
 
@@ -279,14 +279,14 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ isOpen, onCl
 
               <div className="space-y-2">
                 <h3 className="text-xl sm:text-3xl font-black text-slate-950">
-                  DEMANDE TRANSMISE EN DIRECT !
+                  DEMANDE TRANSMISE AVEC SUCCÈS !
                 </h3>
                 <p className="text-xs sm:text-sm font-semibold text-slate-700 max-w-md mx-auto leading-relaxed">
-                  Merci <span className="font-extrabold text-amber-600">{formData.organizerName}</span> ! Votre demande pour <span className="font-extrabold text-slate-950">&quot;{formData.eventName}&quot;</span> a été enregistrée dans l&apos;Espace Admin et transmise sur WhatsApp.
+                  Merci <span className="font-extrabold text-amber-600">{formData.organizerName}</span> ! Votre demande pour <span className="font-extrabold text-slate-950">&quot;{formData.eventName}&quot;</span> a bien été enregistrée.
                 </p>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold mx-auto">
                   <MessageSquare className="w-4 h-4 text-emerald-600" />
-                  <span>WhatsApp ouvert sur le +237 692 88 63 26</span>
+                  <span>Notre équipe étudie vos critères et vous recontactera très vite.</span>
                 </div>
               </div>
 
