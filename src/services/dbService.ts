@@ -1,5 +1,56 @@
 import { Competition, Candidate, INITIAL_COMPETITIONS, INITIAL_CANDIDATES } from '@/data/mockData';
 
+export interface EventRequestData {
+  id?: string;
+  eventName: string;
+  organizerName: string;
+  phone: string;
+  email: string;
+  votePrice: string;
+  candidateEstimate: string;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+  createdAt?: string;
+}
+
+// ----------------------------------------------------
+// EVENT CREATION REQUESTS STORAGE & WA REDIRECTION
+// ----------------------------------------------------
+
+export async function saveEventRequest(reqData: EventRequestData): Promise<EventRequestData> {
+  const newReq: EventRequestData = {
+    ...reqData,
+    id: `req_${Date.now()}`,
+    createdAt: new Date().toISOString(),
+  };
+
+  try {
+    if (typeof window !== 'undefined') {
+      const existingStr = localStorage.getItem('miss_mister_event_requests') || '[]';
+      const existing: EventRequestData[] = JSON.parse(existingStr);
+      existing.unshift(newReq);
+      localStorage.setItem('miss_mister_event_requests', JSON.stringify(existing));
+    }
+  } catch {
+    // Continue
+  }
+
+  return newReq;
+}
+
+export async function getEventRequests(): Promise<EventRequestData[]> {
+  try {
+    if (typeof window !== 'undefined') {
+      const existingStr = localStorage.getItem('miss_mister_event_requests') || '[]';
+      return JSON.parse(existingStr);
+    }
+  } catch {
+    // Fallback
+  }
+  return [];
+}
+
 // ----------------------------------------------------
 // COMPETITIONS CRUD (MANDATORY SUPABASE + DISK JSON)
 // ----------------------------------------------------

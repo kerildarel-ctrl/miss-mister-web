@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Sparkles, Trophy, User, Phone, Mail, DollarSign, Users, Calendar, CheckCircle2, Send } from 'lucide-react';
+import { X, Sparkles, Trophy, User, Phone, Mail, DollarSign, Users, Calendar, CheckCircle2, Send, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { saveEventRequest } from '@/services/dbService';
 
 interface CreateEventModalProps {
   isOpen: boolean;
@@ -25,14 +26,34 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ isOpen, onCl
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-    }, 1000);
+    // 1. Save locally & in Admin Espace /keril
+    await saveEventRequest(formData);
+
+    // 2. Build WhatsApp Message
+    const waText = 
+      `Bonjour Keril, nouvelle demande de création d'événement sur MISS MISTER :\n\n` +
+      `🏆 Événement: ${formData.eventName}\n` +
+      `👤 Responsable: ${formData.organizerName}\n` +
+      `📞 WhatsApp: ${formData.phone}\n` +
+      `✉️ Email: ${formData.email}\n` +
+      `💵 Prix du vote: ${formData.votePrice || '100'} FCFA\n` +
+      `👥 Candidats estimé: ${formData.candidateEstimate || 'Non spécifié'}\n` +
+      `📅 Période: ${formData.startDate || 'Début à convenir'} au ${formData.endDate || 'Fin à convenir'}\n` +
+      `📝 Précisions: ${formData.description || 'Aucune'}`;
+
+    const waUrl = `https://wa.me/237692886326?text=${encodeURIComponent(waText)}`;
+
+    // 3. Open WhatsApp in new window
+    if (typeof window !== 'undefined') {
+      window.open(waUrl, '_blank');
+    }
+
+    setIsSubmitting(false);
+    setIsSubmitted(true);
   };
 
   const handleReset = () => {
@@ -86,7 +107,7 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ isOpen, onCl
                 </h3>
 
                 <p className="text-xs sm:text-sm font-semibold text-slate-600">
-                  Remplissez ce formulaire pour soumettre votre demande d&apos;élection en ligne.
+                  Transmet instantanément la demande à l&apos;Espace Admin &amp; sur WhatsApp (+237 692 88 63 26).
                 </p>
               </div>
 
@@ -258,22 +279,25 @@ export const CreateEventModal: React.FC<CreateEventModalProps> = ({ isOpen, onCl
 
               <div className="space-y-2">
                 <h3 className="text-xl sm:text-3xl font-black text-slate-950">
-                  DEMANDE TRANSMISE AVEC SUCCÈS !
+                  DEMANDE TRANSMISE EN DIRECT !
                 </h3>
                 <p className="text-xs sm:text-sm font-semibold text-slate-700 max-w-md mx-auto leading-relaxed">
-                  Merci <span className="font-extrabold text-amber-600">{formData.organizerName || 'Keril Kousso'}</span> ! Votre demande pour la compétition <span className="font-extrabold text-slate-950">&quot;{formData.eventName}&quot;</span> a bien été enregistrée.
+                  Merci <span className="font-extrabold text-amber-600">{formData.organizerName}</span> ! Votre demande pour <span className="font-extrabold text-slate-950">&quot;{formData.eventName}&quot;</span> a été enregistrée dans l&apos;Espace Admin et transmise sur WhatsApp.
                 </p>
-                <p className="text-xs text-slate-500">
-                  Notre équipe va analyser vos critères et vous recontactera rapidement.
-                </p>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold mx-auto">
+                  <MessageSquare className="w-4 h-4 text-emerald-600" />
+                  <span>WhatsApp ouvert sur le +237 692 88 63 26</span>
+                </div>
               </div>
 
-              <button
-                onClick={handleReset}
-                className="gold-gradient-btn py-3 sm:py-3.5 px-8 rounded-2xl font-black text-xs uppercase tracking-wider text-slate-950 shadow-md"
-              >
-                FERMER
-              </button>
+              <div>
+                <button
+                  onClick={handleReset}
+                  className="gold-gradient-btn py-3 sm:py-3.5 px-8 rounded-2xl font-black text-xs uppercase tracking-wider text-slate-950 shadow-md"
+                >
+                  FERMER
+                </button>
+              </div>
             </div>
           )}
 
