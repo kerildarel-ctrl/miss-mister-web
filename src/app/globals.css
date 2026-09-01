@@ -1,109 +1,83 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --font-poppins: 'Poppins', system-ui, sans-serif;
-    
-    --color-pink: #EC4899;
-    --color-blue: #2563EB;
-    --color-violet: #7C3AED;
-  }
-
-  body {
-    background-color: #F8FAFC;
-    color: #0F172A;
-    font-family: 'Poppins', sans-serif;
-    overflow-x: hidden;
-    margin: 0;
-    padding: 0;
+@layer utilities {
+  .font-poppins {
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
   }
 }
 
-/* Custom Gradients from UI Design Screenshot */
-.pink-gradient-text {
-  background: linear-gradient(135deg, #EC4899 0%, #F43F5E 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Custom Design System Tokens & Animations */
+:root {
+  --primary-blue: #2563eb;
+  --accent-pink: #ec4899;
+  --bg-slate: #f8fafc;
 }
 
-.blue-gradient-text {
-  background: linear-gradient(135deg, #2563EB 0%, #0EA5E9 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+body {
+  background-color: var(--bg-slate);
+  color: #0f172a;
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
 }
 
+/* Glassmorphism Cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.glass-card-dark {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Vibrant Gradient Buttons */
 .pink-blue-gradient-btn {
-  background: linear-gradient(135deg, #E11D48 0%, #EC4899 40%, #8B5CF6 70%, #2563EB 100%);
-  color: #FFFFFF;
-  font-weight: 700;
-  box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.4);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #2563eb 100%);
+  background-size: 200% 200%;
+  transition: all 0.3s ease;
 }
 
 .pink-blue-gradient-btn:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 15px 35px -5px rgba(236, 72, 153, 0.6);
+  background-position: right center;
+  box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.4);
+  transform: translateY(-2px);
 }
 
 .blue-pill-btn {
-  background: #2563EB;
-  color: #FFFFFF;
-  font-weight: 700;
-  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   transition: all 0.3s ease;
 }
 
 .blue-pill-btn:hover {
-  background: #1D4ED8;
+  box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 15px 30px -5px rgba(37, 99, 235, 0.5);
 }
 
-.violet-pill-btn {
-  background: #7C3AED;
-  color: #FFFFFF;
-  font-weight: 700;
-  box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.4);
-  transition: all 0.3s ease;
+/* Glowing Ambient Lights */
+.ambient-glow-pink {
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.25) 0%, rgba(236, 72, 153, 0) 70%);
 }
 
-.violet-pill-btn:hover {
-  background: #6D28D9;
-  transform: translateY(-2px);
-  box-shadow: 0 15px 30px -5px rgba(124, 58, 237, 0.5);
-}
-
-/* Card Shadows & Glass Panels */
-.white-card-shadow {
-  background: #FFFFFF;
-  border-radius: 1.5rem;
-  border: 1px solid #E2E8F0;
-  box-shadow: 0 20px 40px -15px rgba(148, 163, 184, 0.15);
-  transition: all 0.35s ease;
-}
-
-.white-card-shadow:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 30px 60px -15px rgba(148, 163, 184, 0.25);
-  border-color: #CBD5E1;
+.ambient-glow-blue {
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, rgba(37, 99, 235, 0) 70%);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #f1f5f9;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 4px;
+  background: #cbd5e1;
+  border-radius: 9999px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #2563EB;
+  background: #94a3b8;
 }

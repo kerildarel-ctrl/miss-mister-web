@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Candidate } from '@/data/mockData';
-import { Vote, Crown, Eye, Flame } from 'lucide-react';
+import { Vote, Crown, Eye, Flame, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface CandidateCardProps {
@@ -18,7 +18,8 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
   onVoteClick,
   index = 0
 }) => {
-  // Format slug e.g. koussokeril or arielle-kousso
+  const [imageError, setImageError] = useState(false);
+
   const candidateSlug = `${candidate.lastName}${candidate.firstName}`
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '');
@@ -32,6 +33,10 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
     return 'bg-slate-800 text-white font-bold';
   };
 
+  const getInitials = () => {
+    return `${candidate.firstName.charAt(0)}${candidate.lastName.charAt(0)}`.toUpperCase();
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -40,15 +45,27 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
       whileHover={{ y: -6 }}
       className="group relative rounded-3xl bg-white border border-slate-200 hover:border-blue-400 overflow-hidden flex flex-col justify-between shadow-md hover:shadow-xl transition-all duration-300 font-poppins"
     >
-      {/* Top Image Container (Clicking opens /competition/[slug]/[candidateSlug]) */}
-      <div className="relative h-72 sm:h-80 w-full overflow-hidden bg-slate-100">
-        <Image
-          src={candidate.photoUrl}
-          alt={`${candidate.firstName} ${candidate.lastName}`}
-          fill
-          className="object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
+      {/* Top Image / Avatar Container */}
+      <div className="relative h-72 sm:h-80 w-full overflow-hidden bg-slate-900">
+        {!imageError && candidate.photoUrl ? (
+          <Image
+            src={candidate.photoUrl}
+            alt={`${candidate.firstName} ${candidate.lastName}`}
+            fill
+            className="object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          /* Sleek Styled Gradient Avatar Box (No AI Image) */
+          <div className="w-full h-full bg-gradient-to-br from-pink-600 via-purple-700 to-blue-700 flex flex-col items-center justify-center p-6 text-white text-center">
+            <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center font-black text-3xl mb-2 border border-white/30 shadow-lg">
+              {getInitials()}
+            </div>
+            <span className="font-extrabold text-sm tracking-wider uppercase opacity-90">{candidate.firstName} {candidate.lastName}</span>
+          </div>
+        )}
+
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent pointer-events-none" />
 
         {/* Candidate Number Badge Top Left */}
         <div className="absolute top-3.5 left-3.5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-slate-200 font-mono font-extrabold text-xs text-blue-600 shadow-md flex items-center gap-1.5 z-10">
@@ -71,10 +88,10 @@ export const CandidateCard: React.FC<CandidateCardProps> = ({
           </span>
         </div>
 
-        {/* Direct Link to Candidate Page /competition/[slug]/[candidateSlug] */}
+        {/* Direct Link Overlay */}
         <Link
           href={candidateUrl}
-          className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900/30 backdrop-blur-xs"
+          className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900/30 backdrop-blur-xs z-20"
         >
           <div className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-2xl transform scale-75 group-hover:scale-100 transition-transform">
             <Eye className="w-6 h-6" />
