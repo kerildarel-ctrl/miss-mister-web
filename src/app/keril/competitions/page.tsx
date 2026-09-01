@@ -78,7 +78,6 @@ export default function KerilCompetitionsPage() {
       ...formData,
       competitionSlug: selectedCompForCand || formData.competitionSlug || competitions[0]?.slug || 'copa-ahn'
     });
-    // Update candidate count in competition state
     setCompetitions((prev) =>
       prev.map((c) =>
         c.slug === (selectedCompForCand || formData.competitionSlug)
@@ -91,30 +90,30 @@ export default function KerilCompetitionsPage() {
 
   return (
     <AdminAuthGuard>
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex font-poppins">
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col lg:flex-row w-full font-poppins">
         <AdminSidebar />
 
-        <main className="flex-1 lg:ml-64 p-4 sm:p-8 space-y-8 overflow-x-hidden">
+        <main className="flex-1 w-full min-w-0 lg:ml-64 p-4 sm:p-8 space-y-6 sm:space-y-8 overflow-x-hidden">
           
           {/* Top Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
             <div>
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-600" />
-                <span className="text-xs font-extrabold text-blue-600 uppercase tracking-widest">
+                <Sparkles className="w-4 h-4 text-amber-600" />
+                <span className="text-[10px] sm:text-xs font-black text-amber-800 uppercase tracking-widest">
                   Gestion des Événements (/keril)
                 </span>
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                COMPÉTITIONS <span className="text-pink-600">ADMIN</span>
+              <h1 className="text-2xl sm:text-4xl font-black text-slate-950 tracking-tight">
+                COMPÉTITIONS <span className="gradient-text-gold">ADMIN</span>
               </h1>
             </div>
 
             <button
               onClick={handleOpenAddComp}
-              className="pink-blue-gradient-btn py-3 px-6 rounded-2xl font-extrabold text-xs uppercase tracking-wider text-white shadow-md flex items-center justify-center gap-2"
+              className="gold-gradient-btn py-3 px-6 rounded-2xl font-black text-xs uppercase tracking-wider text-slate-950 shadow-md flex items-center justify-center gap-2"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-5 h-5 text-slate-950" />
               <span>Créer une compétition</span>
             </button>
           </div>
@@ -122,8 +121,8 @@ export default function KerilCompetitionsPage() {
           {/* Competitions Table */}
           <div className="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-700">
-                <thead className="bg-slate-50 text-xs font-extrabold uppercase tracking-wider text-blue-600 border-b border-slate-200">
+              <table className="w-full text-left text-sm text-slate-700 min-w-[600px]">
+                <thead className="bg-slate-50 text-[11px] font-black uppercase tracking-wider text-amber-800 border-b border-slate-200">
                   <tr>
                     <th className="py-4 px-6">Compétition</th>
                     <th className="py-4 px-6">Prix du Vote</th>
@@ -148,39 +147,39 @@ export default function KerilCompetitionsPage() {
                     </tr>
                   ) : competitions.map((comp) => (
                     <tr key={comp.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-4 px-6 font-bold text-slate-900">
+                      <td className="py-4 px-6 font-bold text-slate-950">
                         <div className="flex items-center gap-3">
                           <div
                             className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: comp.primaryColor || '#2563EB' }}
+                            style={{ backgroundColor: comp.primaryColor || '#f59e0b' }}
                           />
                           <div>
-                            <p className="text-base font-extrabold text-slate-900">{comp.title}</p>
-                            <p className="text-xs text-slate-400 font-mono">/competition/{comp.slug}</p>
+                            <p className="text-sm sm:text-base font-black text-slate-950">{comp.title}</p>
+                            <p className="text-[11px] text-slate-400 font-mono">/competition/{comp.slug}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-4 px-6 font-mono font-extrabold text-pink-600">
+                      <td className="py-4 px-6 font-mono font-black text-amber-600">
                         {comp.votePrice || 100} FCFA
                       </td>
                       <td className="py-4 px-6">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                          className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
                             comp.status === 'EN COURS'
-                              ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                               : comp.status === 'A VENIR'
-                              ? 'bg-blue-50 text-blue-600 border border-blue-200'
+                              ? 'bg-blue-50 text-blue-700 border border-blue-200'
                               : 'bg-slate-100 text-slate-600 border border-slate-200'
                           }`}
                         >
                           {comp.status}
                         </span>
                       </td>
-                      <td className="py-4 px-6 font-bold text-slate-900 font-mono">{comp.totalCandidates}</td>
+                      <td className="py-4 px-6 font-bold text-slate-950 font-mono">{comp.totalCandidates}</td>
                       <td className="py-4 px-6">
                         <button
                           onClick={() => handleOpenAddCandForComp(comp.slug)}
-                          className="py-1.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-extrabold flex items-center gap-1.5"
+                          className="py-1.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-xs font-black flex items-center gap-1.5"
                         >
                           <UserPlus className="w-3.5 h-3.5" />
                           <span>Ajouter candidat</span>
@@ -198,14 +197,14 @@ export default function KerilCompetitionsPage() {
                           </Link>
                           <button
                             onClick={() => handleToggleStatus(comp.id)}
-                            className="p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
+                            className="p-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 transition-colors"
                             title="Activer / Désactiver"
                           >
                             <Power className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleOpenEditComp(comp)}
-                            className="p-2 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-600 transition-colors"
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
                             title="Modifier"
                           >
                             <Edit3 className="w-4 h-4" />
@@ -228,7 +227,6 @@ export default function KerilCompetitionsPage() {
 
         </main>
 
-        {/* Competition Form Modal */}
         <CompetitionFormModal
           isOpen={isCompModalOpen}
           onClose={() => setIsCompModalOpen(false)}
@@ -236,7 +234,6 @@ export default function KerilCompetitionsPage() {
           initialData={editingCompetition}
         />
 
-        {/* Candidate Form Modal */}
         <CandidateFormModal
           isOpen={isCandModalOpen}
           onClose={() => setIsCandModalOpen(false)}

@@ -60,22 +60,22 @@ export default function KerilSettingsPage() {
 
   return (
     <AdminAuthGuard>
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex font-poppins">
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col lg:flex-row w-full font-poppins">
         <AdminSidebar />
 
-        <main className="flex-1 lg:ml-64 p-4 sm:p-8 space-y-8 overflow-x-hidden">
+        <main className="flex-1 w-full min-w-0 lg:ml-64 p-4 sm:p-8 space-y-6 sm:space-y-8 overflow-x-hidden">
           
           {/* Top Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
             <div>
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-600" />
-                <span className="text-xs font-extrabold text-blue-600 uppercase tracking-widest">
+                <Sparkles className="w-4 h-4 text-amber-600" />
+                <span className="text-[10px] sm:text-xs font-black text-amber-800 uppercase tracking-widest">
                   Paramètres & Sécurité (/keril)
                 </span>
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                PARAMÈTRES <span className="text-pink-600">SYSTÈME</span>
+              <h1 className="text-2xl sm:text-4xl font-black text-slate-950 tracking-tight">
+                PARAMÈTRES <span className="gradient-text-gold">SYSTÈME</span>
               </h1>
             </div>
           </div>
@@ -87,8 +87,8 @@ export default function KerilSettingsPage() {
                 <RotateCcw className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-lg font-black text-slate-900">Réinitialisation & Synchronisation Base</h3>
-                <p className="text-xs text-slate-500">Videz la base pour repartir à 0 ou réinjectez les compétitions de démonstration.</p>
+                <h3 className="text-base sm:text-lg font-black text-slate-950">Réinitialisation & Synchronisation Base</h3>
+                <p className="text-xs text-slate-500 font-semibold">Videz la base pour repartir à 0 ou réinjectez les compétitions de démonstration.</p>
               </div>
             </div>
 
@@ -104,9 +104,9 @@ export default function KerilSettingsPage() {
                 type="button"
                 onClick={handleResetToZero}
                 disabled={isResetting}
-                className="py-3 px-6 rounded-2xl bg-rose-600 hover:bg-rose-700 font-extrabold text-xs text-white shadow-md flex items-center gap-2 transition-colors"
+                className="py-3 px-6 rounded-2xl bg-rose-600 hover:bg-rose-700 font-black text-xs uppercase tracking-wider text-white shadow-md flex items-center gap-2 transition-colors"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-white" />
                 <span>{isResetting ? 'Réinitialisation...' : 'Tout Réinitialiser à 0'}</span>
               </button>
 
@@ -114,9 +114,9 @@ export default function KerilSettingsPage() {
                 type="button"
                 onClick={handleSeedDatabase}
                 disabled={isSeeding}
-                className="py-3 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 font-extrabold text-xs text-white shadow-md flex items-center gap-2 transition-colors"
+                className="py-3 px-6 rounded-2xl gold-gradient-btn font-black text-xs uppercase tracking-wider text-slate-950 shadow-md flex items-center gap-2 transition-colors"
               >
-                <Database className="w-4 h-4" />
+                <Database className="w-4 h-4 text-slate-950" />
                 <span>{isSeeding ? 'Initialisation...' : 'Injecter les Données de Démo'}</span>
               </button>
             </div>
@@ -129,32 +129,32 @@ export default function KerilSettingsPage() {
               
               {/* Nom de la plateforme */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-black text-slate-800 uppercase tracking-wider mb-2">
                   Nom de la plateforme
                 </label>
                 <input
                   type="text"
                   value={platformName}
                   onChange={(e) => setPlatformName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-bold text-sm focus:outline-none focus:border-blue-500 shadow-xs"
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-950 font-bold text-sm focus:outline-none focus:border-amber-500 shadow-xs"
                 />
               </div>
 
               {/* Slogan */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-black text-slate-800 uppercase tracking-wider mb-2">
                   Slogan officiel
                 </label>
                 <input
                   type="text"
                   value={slogan}
                   onChange={(e) => setSlogan(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-sm focus:outline-none focus:border-blue-500 shadow-xs"
+                  className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-slate-950 text-sm font-bold focus:outline-none focus:border-amber-500 shadow-xs"
                 />
               </div>
 
               {savedSuccess && (
-                <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-xs text-emerald-700 font-bold flex items-center gap-2">
+                <div className="bg-emerald-50 p-3.5 rounded-2xl border border-emerald-200 text-xs text-emerald-800 font-bold flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span>Paramètres enregistrés avec succès !</span>
                 </div>
@@ -163,9 +163,9 @@ export default function KerilSettingsPage() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="pink-blue-gradient-btn py-3.5 px-6 rounded-2xl font-extrabold text-xs uppercase tracking-wider text-white shadow-md flex items-center gap-2"
+                  className="gold-gradient-btn py-3.5 px-6 rounded-2xl font-black text-xs uppercase tracking-wider text-slate-950 shadow-md flex items-center gap-2"
                 >
-                  <Save className="w-4 h-4" />
+                  <Save className="w-4 h-4 text-slate-950" />
                   <span>Enregistrer les paramètres</span>
                 </button>
               </div>

@@ -29,29 +29,29 @@ export default function KerilDashboardPage() {
 
   return (
     <AdminAuthGuard>
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex font-poppins">
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col lg:flex-row w-full font-poppins">
         {/* Sidebar */}
         <AdminSidebar />
 
         {/* Main Content Area */}
-        <main className="flex-1 lg:ml-64 p-4 sm:p-8 space-y-8 overflow-x-hidden">
+        <main className="flex-1 w-full min-w-0 lg:ml-64 p-4 sm:p-8 space-y-6 sm:space-y-8 overflow-x-hidden">
           
           {/* Top Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
             <div>
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-600" />
-                <span className="text-xs font-extrabold text-blue-600 uppercase tracking-widest">
-                  Espace Administration Securisé /keril
+                <Sparkles className="w-4 h-4 text-amber-600" />
+                <span className="text-[10px] sm:text-xs font-black text-amber-800 uppercase tracking-widest">
+                  Espace Administration Sécurisé /keril
                 </span>
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                DASHBOARD <span className="text-pink-600">ADMIN</span>
+              <h1 className="text-2xl sm:text-4xl font-black text-slate-950 tracking-tight">
+                DASHBOARD <span className="gradient-text-gold">ADMIN</span>
               </h1>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs font-extrabold flex items-center gap-1.5 shadow-xs">
+              <span className="px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-black flex items-center gap-1.5 shadow-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
                 Système Actif
               </span>
@@ -59,7 +59,7 @@ export default function KerilDashboardPage() {
           </div>
 
           {/* 4 DYNAMIC STATISTICAL KPI CARDS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <StatisticsCard
               title="Compétitions"
               value={isLoading ? '...' : competitions.length.toString()}
@@ -95,24 +95,24 @@ export default function KerilDashboardPage() {
           </div>
 
           {/* CHARTS & RECENT ACTIVITY SECTION */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
             
             {/* Left Col: Activity Charts */}
             <div className="lg:col-span-7 space-y-6">
               
               {/* Votes Activity Chart */}
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
+              <div className="bg-white p-4 sm:p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-lg sm:text-xl font-black text-slate-950 flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-amber-600" />
                       <span>Activité Hebdomadaire des Votes</span>
                     </h3>
-                    <p className="text-xs text-slate-500">Volume quotidien des suffrages exprimés</p>
+                    <p className="text-xs text-slate-500 font-semibold">Volume quotidien des suffrages exprimés</p>
                   </div>
                 </div>
 
-                <div className="h-56 w-full flex items-end justify-between gap-3 pt-6 pb-2">
+                <div className="h-56 w-full flex items-end justify-between gap-2 sm:gap-3 pt-6 pb-2">
                   {[
                     { day: 'Lun', val: Math.round(totalVotes * 0.1) },
                     { day: 'Mar', val: Math.round(totalVotes * 0.12) },
@@ -122,29 +122,29 @@ export default function KerilDashboardPage() {
                     { day: 'Sam', val: Math.round(totalVotes * 0.25) },
                     { day: 'Dim', val: Math.round(totalVotes * 0.05) },
                   ].map((item, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
-                      <span className="text-[10px] font-mono text-blue-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1.5 group h-full justify-end">
+                      <span className="text-[9px] sm:text-[10px] font-mono text-amber-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
                         {item.val}
                       </span>
                       <div
-                        className="w-full bg-gradient-to-t from-pink-500 to-blue-600 rounded-t-lg transition-all group-hover:brightness-110 shadow-sm"
+                        className="w-full bg-gradient-to-t from-amber-500 to-yellow-400 rounded-t-lg transition-all group-hover:brightness-110 shadow-xs"
                         style={{ height: totalVotes > 0 ? `${(item.val / (totalVotes * 0.25 || 1)) * 100}%` : '4px' }}
                       />
-                      <span className="text-xs text-slate-500 font-bold">{item.day}</span>
+                      <span className="text-[11px] text-slate-600 font-bold">{item.day}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Competitions Distribution Chart */}
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
-                <h3 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-pink-600" />
+              <div className="bg-white p-4 sm:p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
+                <h3 className="text-lg sm:text-xl font-black text-slate-950 flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-amber-600" />
                   <span>Répartition des Votes par Compétition</span>
                 </h3>
 
                 {competitions.length === 0 ? (
-                  <p className="text-xs text-slate-500 italic py-4 text-center">
+                  <p className="text-xs text-slate-500 italic py-4 text-center font-semibold">
                     Aucune compétition créée. Utilisez la rubrique Compétitions pour en créer une.
                   </p>
                 ) : (
@@ -156,12 +156,12 @@ export default function KerilDashboardPage() {
                       return (
                         <div key={comp.id} className="space-y-1">
                           <div className="flex justify-between text-xs font-bold">
-                            <span className="text-slate-900">{comp.title} (Vote: {comp.votePrice || 100} FCFA)</span>
-                            <span className="text-blue-600 font-mono">{compVotes.toLocaleString('fr-FR')} votes ({pct}%)</span>
+                            <span className="text-slate-950">{comp.title} (Vote: {comp.votePrice || 100} FCFA)</span>
+                            <span className="text-amber-600 font-mono">{compVotes.toLocaleString('fr-FR')} votes ({pct}%)</span>
                           </div>
                           <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden">
                             <div
-                              className="h-full bg-gradient-to-r from-blue-600 to-pink-500 rounded-full"
+                              className="h-full gold-gradient-btn rounded-full"
                               style={{ width: `${pct}%` }}
                             />
                           </div>
@@ -176,17 +176,17 @@ export default function KerilDashboardPage() {
 
             {/* Right Col: Recent Votes Feed */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
+              <div className="bg-white p-4 sm:p-6 rounded-3xl border border-slate-200 shadow-md space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-                  <h3 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-pink-600 animate-pulse" />
+                  <h3 className="text-lg sm:text-xl font-black text-slate-950 flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-amber-600 animate-pulse" />
                     <span>Derniers Votes Exprimés</span>
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 uppercase">En Direct</span>
+                  <span className="text-[10px] font-mono text-slate-500 uppercase font-bold">En Direct</span>
                 </div>
 
                 {candidates.length === 0 || totalVotes === 0 ? (
-                  <p className="text-xs text-slate-500 italic py-6 text-center">
+                  <p className="text-xs text-slate-500 italic py-6 text-center font-semibold">
                     Aucun vote enregistré pour le moment.
                   </p>
                 ) : (
@@ -197,15 +197,15 @@ export default function KerilDashboardPage() {
                       .map((cand) => (
                         <div
                           key={cand.id}
-                          className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between gap-3"
+                          className="bg-slate-50 p-3 sm:p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between gap-3"
                         >
                           <div>
-                            <h4 className="text-sm font-bold text-slate-900">
+                            <h4 className="text-xs sm:text-sm font-bold text-slate-950">
                               {cand.firstName} {cand.lastName}
                             </h4>
-                            <p className="text-xs text-slate-500">{cand.competitionSlug} • Candidat N°{cand.candidateNumber}</p>
+                            <p className="text-[11px] text-slate-500">{cand.competitionSlug} • N°{cand.candidateNumber}</p>
                           </div>
-                          <span className="text-[10px] font-mono text-pink-600 bg-pink-50 px-2 py-1 rounded border border-pink-200 font-bold">
+                          <span className="text-[10px] font-mono text-amber-900 bg-amber-50 px-2 py-1 rounded-full border border-amber-200 font-bold">
                             {cand.voteCount} vote(s)
                           </span>
                         </div>

@@ -60,22 +60,22 @@ export default function KerilCandidatesPage() {
 
   return (
     <AdminAuthGuard>
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex font-poppins">
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col lg:flex-row w-full font-poppins">
         <AdminSidebar />
 
-        <main className="flex-1 lg:ml-64 p-4 sm:p-8 space-y-8 overflow-x-hidden">
+        <main className="flex-1 w-full min-w-0 lg:ml-64 p-4 sm:p-8 space-y-6 sm:space-y-8 overflow-x-hidden">
           
           {/* Top Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
             <div>
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-600" />
-                <span className="text-xs font-extrabold text-blue-600 uppercase tracking-widest">
+                <Sparkles className="w-4 h-4 text-amber-600" />
+                <span className="text-[10px] sm:text-xs font-black text-amber-800 uppercase tracking-widest">
                   Gestion des Candidats (/keril)
                 </span>
               </div>
-              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                CANDIDATS <span className="text-pink-600">ADMIN</span>
+              <h1 className="text-2xl sm:text-4xl font-black text-slate-950 tracking-tight">
+                CANDIDATS <span className="gradient-text-gold">ADMIN</span>
               </h1>
             </div>
 
@@ -87,15 +87,15 @@ export default function KerilCandidatesPage() {
                   placeholder="Rechercher..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-blue-500 shadow-sm"
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-950 text-xs font-bold placeholder-slate-400 focus:outline-none focus:border-amber-500 shadow-sm"
                 />
               </div>
 
               <button
                 onClick={handleOpenAdd}
-                className="w-full sm:w-auto pink-blue-gradient-btn py-2.5 px-5 rounded-2xl font-extrabold text-xs uppercase tracking-wider text-white shadow-md flex items-center justify-center gap-2"
+                className="w-full sm:w-auto gold-gradient-btn py-2.5 px-5 rounded-2xl font-black text-xs uppercase tracking-wider text-slate-950 shadow-md flex items-center justify-center gap-2"
               >
-                <UserPlus className="w-4 h-4" />
+                <UserPlus className="w-4 h-4 text-slate-950" />
                 <span>Ajouter un candidat</span>
               </button>
             </div>
@@ -104,8 +104,8 @@ export default function KerilCandidatesPage() {
           {/* Candidates Table */}
           <div className="bg-white rounded-3xl border border-slate-200 shadow-md overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-700">
-                <thead className="bg-slate-50 text-xs font-extrabold uppercase tracking-wider text-blue-600 border-b border-slate-200">
+              <table className="w-full text-left text-sm text-slate-700 min-w-[600px]">
+                <thead className="bg-slate-50 text-[11px] font-black uppercase tracking-wider text-amber-800 border-b border-slate-200">
                   <tr>
                     <th className="py-4 px-6">Candidat</th>
                     <th className="py-4 px-6">Catégorie</th>
@@ -129,7 +129,7 @@ export default function KerilCandidatesPage() {
                     </tr>
                   ) : filteredCandidates.map((cand) => (
                     <tr key={cand.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="py-4 px-6 font-bold text-slate-900">
+                      <td className="py-4 px-6 font-bold text-slate-950">
                         <div className="flex items-center gap-3">
                           <div className="relative w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 border border-slate-200">
                             <Image
@@ -140,29 +140,29 @@ export default function KerilCandidatesPage() {
                             />
                           </div>
                           <div>
-                            <p className="text-sm font-extrabold text-slate-900">
-                              {cand.firstName} <span className="uppercase text-blue-600">{cand.lastName}</span>
+                            <p className="text-sm font-black text-slate-950">
+                              {cand.firstName} <span className="uppercase text-amber-600">{cand.lastName}</span>
                             </p>
-                            <p className="text-xs text-slate-400 font-mono">
+                            <p className="text-[11px] text-slate-400 font-mono">
                               N° {cand.candidateNumber} • Rang #{cand.rank}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-4 px-6 font-bold text-slate-700">
-                        <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-xs border border-slate-200 font-extrabold">
+                      <td className="py-4 px-6 font-bold text-slate-800">
+                        <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-xs border border-slate-200 font-black">
                           {cand.category}
                         </span>
                       </td>
                       <td className="py-4 px-6 text-xs text-slate-500 font-mono">{cand.competitionSlug}</td>
-                      <td className="py-4 px-6 font-extrabold text-pink-600 font-mono">
+                      <td className="py-4 px-6 font-black text-amber-600 font-mono">
                         {cand.voteCount.toLocaleString('fr-FR')} votes ({cand.percentage}%)
                       </td>
                       <td className="py-4 px-6 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleOpenEdit(cand)}
-                            className="p-2 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-600 transition-colors"
+                            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
                             title="Modifier"
                           >
                             <Edit3 className="w-4 h-4" />
