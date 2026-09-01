@@ -6,113 +6,96 @@
   }
 }
 
-/* Luxury Royal Gold & Dark Midnight Theme Tokens */
+/* Premium Design Tokens with Gold Highlights */
 :root {
   --primary-blue: #3b82f6;
   --accent-gold-light: #fde047;
   --accent-gold: #f59e0b;
   --accent-gold-dark: #b45309;
   --accent-pink: #ec4899;
-  --accent-rose: #f43f5e;
-  --bg-dark: #0a0d14;
+  --bg-slate: #f8fafc;
 }
 
 body {
-  background-color: #0a0d14;
-  color: #f8fafc;
+  background-color: #f8fafc;
+  color: #0f172a;
   font-family: 'Poppins', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Captivating Animated Gold & Pink Gradient Text */
+/* Gold Gradient Text on Key Highlights */
 .gradient-text-gold {
-  background: linear-gradient(135deg, #fff7ed 0%, #fde047 30%, #f59e0b 70%, #d97706 100%);
-  background-size: 200% auto;
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shineGold 4s linear infinite;
 }
 
 .gradient-text-captivating {
-  background: linear-gradient(135deg, #fde047 0%, #ec4899 40%, #8b5cf6 75%, #3b82f6 100%);
-  background-size: 200% auto;
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shineGold 4s linear infinite;
 }
 
-@keyframes shineGold {
-  to {
-    background-position: 200% center;
-  }
-}
-
-/* Glassmorphism Cards with Luxury Gold Glowing Borders */
-.glass-card-gold {
-  background: rgba(15, 22, 36, 0.88);
+/* Glassmorphism Light Cards with Gold Accent Highlights */
+.glass-card-light {
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.15), 0 0 20px 0 rgba(236, 72, 153, 0.08);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-card-gold:hover {
-  border-color: rgba(245, 158, 11, 0.6);
-  box-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.3), 0 0 30px 0 rgba(236, 72, 153, 0.2);
+.glass-card-light:hover {
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 20px 40px -10px rgba(245, 158, 11, 0.2);
   transform: translateY(-4px);
 }
 
-/* Royal Gold & Captivating Buttons */
+/* Luxury Gold Accent Button for Key Highlights */
 .gold-gradient-btn {
-  background: linear-gradient(135deg, #fde047 0%, #f59e0b 50%, #d97706 100%);
-  color: #0b0f19;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  color: #0f172a;
   font-weight: 900;
   transition: all 0.35s ease;
 }
 
 .gold-gradient-btn:hover {
-  box-shadow: 0 12px 28px -6px rgba(245, 158, 11, 0.5);
-  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 28px -6px rgba(245, 158, 11, 0.45);
+  transform: translateY(-2px) scale(1.02);
 }
 
-.captivating-gradient-btn {
-  background: linear-gradient(135deg, #f43f5e 0%, #ec4899 40%, #8b5cf6 75%, #3b82f6 100%);
-  background-size: 200% 200%;
+.pink-blue-gradient-btn {
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #3b82f6 100%);
   color: #ffffff;
   transition: all 0.35s ease;
 }
 
-.captivating-gradient-btn:hover {
-  background-position: right center;
-  box-shadow: 0 12px 28px -6px rgba(244, 63, 94, 0.45);
-  transform: translateY(-2px) scale(1.02);
+.pink-blue-gradient-btn:hover {
+  box-shadow: 0 12px 28px -6px rgba(236, 72, 153, 0.4);
+  transform: translateY(-2px);
 }
 
-/* Ambient Glowing Background Orbs */
+/* Ambient Background Lights */
 .ambient-orb-gold {
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0) 70%);
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0) 70%);
 }
 
-.ambient-orb-rose {
-  background: radial-gradient(circle, rgba(244, 63, 94, 0.3) 0%, rgba(244, 63, 94, 0) 70%);
-}
-
-.ambient-orb-violet {
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, rgba(139, 92, 246, 0) 70%);
+.ambient-orb-pink {
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, rgba(236, 72, 153, 0) 70%);
 }
 
 .ambient-orb-blue {
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0) 70%);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0) 70%);
 }
 
-/* Custom Gold Scrollbar */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0d14;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #f59e0b, #ec4899);
