@@ -89,7 +89,7 @@ export default function DirectCandidatePage({
     return (
       <>
         <Header />
-        <main className="min-h-[60vh] bg-[#F8FAFC] py-20 text-center font-poppins font-bold text-slate-500">
+        <main className="min-h-[60vh] bg-[#0B0E14] py-20 text-center font-poppins font-bold text-slate-400">
           Chargement du profil du candidat...
         </main>
         <Footer />
@@ -101,10 +101,10 @@ export default function DirectCandidatePage({
     return (
       <>
         <Header />
-        <main className="min-h-[60vh] bg-[#F8FAFC] py-20 text-center font-poppins space-y-4 px-4">
-          <Sparkles className="w-12 h-12 text-amber-500 mx-auto" />
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">Candidat non trouvé</h2>
-          <p className="text-xs sm:text-sm text-slate-500">Le profil recherché n&apos;existe pas.</p>
+        <main className="min-h-[60vh] bg-[#0B0E14] py-20 text-center font-poppins space-y-4 px-4 text-white">
+          <Sparkles className="w-12 h-12 text-amber-400 mx-auto" />
+          <h2 className="text-2xl sm:text-3xl font-black text-white">Candidat non trouvé</h2>
+          <p className="text-xs sm:text-sm text-slate-300">Le profil recherché n&apos;existe pas.</p>
           <Link href="/competitions" className="inline-block gold-gradient-btn py-3 px-6 rounded-2xl text-slate-950 font-black text-xs uppercase">
             Voir toutes les compétitions
           </Link>
@@ -120,22 +120,22 @@ export default function DirectCandidatePage({
     <>
       <Header />
 
-      <main className="flex-1 min-h-screen py-6 sm:py-10 px-3 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-6 sm:space-y-8 font-poppins bg-[#F8FAFC]">
+      <main className="flex-1 min-h-screen py-6 sm:py-10 px-3 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-6 sm:space-y-8 font-poppins bg-[#0B0E14] text-white">
         
         {/* Back Link */}
         <Link
           href={competition ? `/competition/${competition.slug}` : '/competitions'}
-          className="inline-flex items-center gap-2 text-xs font-bold text-slate-800 hover:text-amber-700 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-xs w-fit"
+          className="inline-flex items-center gap-2 text-xs font-bold text-slate-200 hover:text-amber-400 bg-[#131A26] px-4 py-2 rounded-full border border-amber-500/20 shadow-xs w-fit"
         >
-          <ArrowLeft className="w-4 h-4 text-amber-600" /> Retour à la compétition
+          <ArrowLeft className="w-4 h-4 text-amber-400" /> Retour à la compétition
         </Link>
 
-        {/* Candidate Detail Card Layout - ULTRA RESPONSIVE & SOBER */}
-        <div className="bg-white rounded-3xl p-4 sm:p-8 lg:p-10 border border-slate-200 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
+        {/* Candidate Detail Card Layout - DARK GLASSMORPHISM */}
+        <div className="bg-[#131A26]/90 backdrop-blur-xl rounded-3xl p-4 sm:p-8 lg:p-10 border border-amber-500/25 shadow-2xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
           
           {/* Left: Large Portrait Photo (Responsive Height) */}
           <div className="lg:col-span-5 relative w-full">
-            <div className="relative h-80 sm:h-[460px] w-full rounded-2xl overflow-hidden border border-slate-200 shadow-lg group bg-slate-900">
+            <div className="relative h-80 sm:h-[460px] w-full rounded-2xl overflow-hidden border border-amber-500/30 shadow-xl group bg-slate-950">
               <Image
                 src={candidate.photoUrl}
                 alt={`${candidate.firstName} ${candidate.lastName}`}
@@ -146,8 +146,8 @@ export default function DirectCandidatePage({
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
 
               {/* Number Badge */}
-              <div className="absolute top-3.5 left-3.5 bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-amber-200 font-mono font-black text-xs sm:text-sm text-amber-700 shadow-md flex items-center gap-1.5">
-                <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
+              <div className="absolute top-3.5 left-3.5 bg-slate-950/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-amber-400/40 font-mono font-black text-xs sm:text-sm text-amber-400 shadow-md flex items-center gap-1.5">
+                <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
                 <span>{candidate.candidateNumber}</span>
               </div>
 
@@ -174,31 +174,31 @@ export default function DirectCandidatePage({
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 {competition && (
-                  <span className="px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200 flex items-center gap-1">
-                    <Trophy className="w-3.5 h-3.5 text-amber-600" /> {competition.title}
+                  <span className="px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-[#0B0E14] text-slate-200 border border-amber-500/20 flex items-center gap-1">
+                    <Trophy className="w-3.5 h-3.5 text-amber-400" /> {competition.title}
                   </span>
                 )}
-                <span className="px-3 py-1 rounded-full text-[11px] sm:text-xs font-black bg-amber-50 text-amber-800 border border-amber-300 font-mono flex items-center gap-1">
-                  <Tag className="w-3.5 h-3.5 text-amber-600" /> 1 Vote = {votePrice} FCFA
+                <span className="px-3 py-1 rounded-full text-[11px] sm:text-xs font-black bg-amber-500/10 text-amber-400 border border-amber-500/30 font-mono flex items-center gap-1">
+                  <Tag className="w-3.5 h-3.5 text-amber-400" /> 1 Vote = {votePrice} FCFA
                 </span>
               </div>
 
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight leading-tight">
-                {candidate.firstName} <span className="uppercase text-amber-600">{candidate.lastName}</span>
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+                {candidate.firstName} <span className="uppercase text-amber-400">{candidate.lastName}</span>
               </h1>
             </div>
 
             {/* Statistics box */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 bg-[#0B0E14] p-4 sm:p-5 rounded-2xl border border-amber-500/20">
               <div>
-                <p className="text-[10px] sm:text-xs text-slate-500 uppercase font-black tracking-wider">Total Votes</p>
-                <p className="text-xl sm:text-3xl font-black text-amber-600 font-mono mt-0.5">
+                <p className="text-[10px] sm:text-xs text-slate-400 uppercase font-black tracking-wider">Total Votes</p>
+                <p className="text-xl sm:text-3xl font-black text-amber-400 font-mono mt-0.5">
                   {candidate.voteCount.toLocaleString('fr-FR')}
                 </p>
               </div>
               <div>
-                <p className="text-[10px] sm:text-xs text-slate-500 uppercase font-black tracking-wider">Pourcentage</p>
-                <p className="text-xl sm:text-3xl font-black text-slate-950 font-mono mt-0.5">
+                <p className="text-[10px] sm:text-xs text-slate-400 uppercase font-black tracking-wider">Pourcentage</p>
+                <p className="text-xl sm:text-3xl font-black text-white font-mono mt-0.5">
                   {candidate.percentage}%
                 </p>
               </div>
@@ -206,19 +206,19 @@ export default function DirectCandidatePage({
 
             {/* Biography */}
             <div className="space-y-1.5">
-              <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+              <h3 className="text-xs font-black text-slate-200 uppercase tracking-wider">
                 Biographie & Parcours
               </h3>
-              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-200 font-normal">
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed bg-[#0B0E14] p-4 rounded-2xl border border-amber-500/20 font-medium">
                 {candidate.bio}
               </p>
             </div>
 
             {/* Social handles */}
             {candidate.socialInstagram && (
-              <div className="flex items-center gap-2 text-xs text-slate-600">
-                <Globe className="w-4 h-4 text-amber-600" />
-                <span>Instagram : <strong className="text-slate-900">{candidate.socialInstagram}</strong></span>
+              <div className="flex items-center gap-2 text-xs text-slate-300">
+                <Globe className="w-4 h-4 text-amber-400" />
+                <span>Instagram : <strong className="text-white">{candidate.socialInstagram}</strong></span>
               </div>
             )}
 
@@ -234,16 +234,16 @@ export default function DirectCandidatePage({
 
               <button
                 onClick={handleShare}
-                className="w-full py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-black text-xs flex items-center justify-center gap-2 border border-slate-200 transition-colors uppercase tracking-wider"
+                className="w-full py-3 px-4 rounded-2xl bg-[#0B0E14] hover:bg-slate-900 text-slate-200 font-black text-xs flex items-center justify-center gap-2 border border-amber-500/20 transition-colors uppercase tracking-wider"
               >
                 {copiedShare ? (
                   <>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span className="text-emerald-700">Lien copié dans le presse-papier !</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span className="text-emerald-400">Lien copié dans le presse-papier !</span>
                   </>
                 ) : (
                   <>
-                    <Share2 className="w-4 h-4 text-amber-600" />
+                    <Share2 className="w-4 h-4 text-amber-400" />
                     <span>Partager le profil du candidat</span>
                   </>
                 )}
