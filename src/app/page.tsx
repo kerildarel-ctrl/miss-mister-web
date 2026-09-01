@@ -115,7 +115,7 @@ export default function HomePage() {
               transition={{ delay: 0.4 }}
               className="flex flex-wrap items-center justify-center gap-4 pt-4"
             >
-              {/* HIGH-VISIBILITY BUTTON: CRÉER MON ÉVÉNEMENT (OPENS FORM MODAL) */}
+              {/* HIGH-VISIBILITY BUTTON: CRÉER MON ÉVÉNEMENT */}
               <button
                 onClick={() => setIsEventModalOpen(true)}
                 className="gold-gradient-btn py-4 px-8 rounded-2xl text-sm font-black uppercase tracking-wider text-slate-950 flex items-center gap-2.5 shadow-2xl hover:scale-105 transition-transform border-2 border-amber-400"
@@ -168,7 +168,7 @@ export default function HomePage() {
             <div className="space-y-1">
               <p className="text-xs font-black text-slate-600 uppercase tracking-wider">Débit Sécurisé</p>
               <p className="text-xs font-black text-emerald-700 uppercase flex items-center justify-center gap-1 mt-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" /> Fapshi 100% Vérifié
+                <ShieldCheck className="w-4 h-4 text-emerald-600" /> Mobile Money 100% Sécurisé
               </p>
             </div>
           </motion.div>
@@ -256,7 +256,7 @@ export default function HomePage() {
         </section>
 
         {/* ========================================================================= */}
-        {/* THIRD SECTION: SECURITY BANNER WITH SECOND EVENT CREATION CTA */}
+        {/* THIRD SECTION: SECURITY BANNER */}
         {/* ========================================================================= */}
         <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <div className="bg-slate-900 rounded-3xl p-8 sm:p-14 text-white shadow-2xl relative overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-8 items-center border border-amber-500/20">
@@ -283,7 +283,7 @@ export default function HomePage() {
                   <CheckCircle className="w-4 h-4 text-emerald-400" /> Configuration Rapide
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" /> API Fapshi Officielle
+                  <CheckCircle className="w-4 h-4 text-emerald-400" /> Débit Direct Sécurisé
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle className="w-4 h-4 text-emerald-400" /> Support 24/7

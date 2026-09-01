@@ -1,33 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Crown, Palette, Sun, Moon, Sparkles } from 'lucide-react';
+import { Menu, X, Crown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState<'light-gold' | 'dark-gold' | 'vibrant-pink'>('light-gold');
-  const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
   const pathname = usePathname();
-
-  // Load saved theme on mount
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('miss_mister_theme') as any;
-    if (savedTheme && ['light-gold', 'dark-gold', 'vibrant-pink'].includes(savedTheme)) {
-      setCurrentTheme(savedTheme);
-      document.documentElement.setAttribute('data-theme', savedTheme);
-    }
-  }, []);
-
-  const changeTheme = (theme: 'light-gold' | 'dark-gold' | 'vibrant-pink') => {
-    setCurrentTheme(theme);
-    localStorage.setItem('miss_mister_theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
-    setIsThemeDropdownOpen(false);
-  };
 
   const navLinks = [
     { href: '/', label: 'Accueil' },
@@ -62,7 +44,7 @@ export const Header: React.FC = () => {
                   <Crown className="w-6 h-6 text-slate-950 fill-slate-950 animate-pulse" />
                 </div>
                 <div className="flex items-center text-2xl sm:text-3xl font-black tracking-tight leading-none">
-                  <span className="text-slate-900">MISS </span>
+                  <span className="text-slate-950">MISS </span>
                   <span className="gradient-text-gold ml-1">MISTER</span>
                 </div>
               </div>
@@ -89,87 +71,14 @@ export const Header: React.FC = () => {
             })}
           </nav>
 
-          {/* INTERACTIVE COLOR THEME SELECTOR DROPDOWN (REPLACED TOP VOTE BUTTON) */}
-          <div className="relative flex items-center gap-2">
-            
-            {/* Color Theme Selector Trigger */}
-            <button
-              onClick={() => setIsThemeDropdownOpen(!isThemeDropdownOpen)}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-slate-100 hover:bg-amber-50 border border-amber-300/80 text-xs font-black text-slate-900 shadow-sm transition-all"
-              title="Choisir le style de couleurs"
-            >
-              <Palette className="w-4 h-4 text-amber-500" />
-              <span className="hidden sm:inline uppercase tracking-wider">Style</span>
-              <span className="text-[10px] bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full font-black">
-                {currentTheme === 'light-gold' ? '☀️ Or Épuré' : currentTheme === 'dark-gold' ? '🌙 Gala Noir' : '💖 Rose'}
-              </span>
-            </button>
-
-            {/* Theme Selection Dropdown Menu */}
-            <AnimatePresence>
-              {isThemeDropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute right-0 top-12 w-56 bg-white rounded-3xl p-3 shadow-2xl border border-amber-300/80 z-50 space-y-1.5 font-poppins"
-                >
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 py-1">
-                    Choisir votre Thème
-                  </p>
-
-                  <button
-                    onClick={() => changeTheme('light-gold')}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-black transition-all ${
-                      currentTheme === 'light-gold'
-                        ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                        : 'text-slate-800 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Sun className="w-4 h-4 text-amber-500" /> ☀️ Royal Or & Épuré
-                    </span>
-                    {currentTheme === 'light-gold' && <span className="text-amber-600 font-bold">✓</span>}
-                  </button>
-
-                  <button
-                    onClick={() => changeTheme('dark-gold')}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-black transition-all ${
-                      currentTheme === 'dark-gold'
-                        ? 'bg-slate-900 text-amber-400 border border-amber-500/40'
-                        : 'text-slate-800 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Moon className="w-4 h-4 text-amber-400" /> 🌙 Gala Noir & Or
-                    </span>
-                    {currentTheme === 'dark-gold' && <span className="text-amber-400 font-bold">✓</span>}
-                  </button>
-
-                  <button
-                    onClick={() => changeTheme('vibrant-pink')}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs font-black transition-all ${
-                      currentTheme === 'vibrant-pink'
-                        ? 'bg-pink-100 text-pink-900 border border-pink-300'
-                        : 'text-slate-800 hover:bg-slate-50'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-pink-500" /> 💖 Rose & Violet
-                    </span>
-                    {currentTheme === 'vibrant-pink' && <span className="text-pink-600 font-bold">✓</span>}
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Mobile Menu Toggle */}
+          {/* Mobile Navigation Toggle */}
+          <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2.5 rounded-2xl text-slate-800 hover:text-amber-600 bg-slate-100 border border-slate-200/80 shadow-xs"
+              className="p-2.5 rounded-2xl text-slate-800 hover:text-amber-600 bg-slate-100 border border-slate-200/80 shadow-xs"
               aria-label="Toggle Navigation"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6 text-amber-600" /> : <Menu className="w-6 h-6 text-blue-600" />}
+              {isMobileMenuOpen ? <X className="w-6 h-6 text-amber-600" /> : <Menu className="w-6 h-6 text-amber-600" />}
             </button>
           </div>
 

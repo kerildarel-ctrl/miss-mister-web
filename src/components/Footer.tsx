@@ -24,7 +24,7 @@ export const Footer: React.FC = () => {
 
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Paiement Sécurisé Fapshi</span>
+              <span>Paiement Sécurisé Mobile Money</span>
             </div>
           </div>
 

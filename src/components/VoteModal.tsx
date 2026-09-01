@@ -59,7 +59,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
           const data = await res.json();
 
           if (data.isSuccess) {
-            // MONEY CONFIRMED DEDUCTED BY FAPSHI!
+            // MONEY CONFIRMED DEDUCTED!
             clearInterval(timer);
             setStep('SUCCESS');
             onConfirmVote(candidate?.id || '', voteCount);
@@ -98,7 +98,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
 
   const totalPrice = voteCount * unitVotePrice;
 
-  // Initiate Payment & AUTOMATICALLY REDIRECT TO FAPSHI PORTAL
+  // Initiate Payment & AUTOMATICALLY REDIRECT TO PAYMENT PORTAL
   const handleInitiatePayment = async () => {
     setIsSubmitting(true);
     setErrorMessage(null);
@@ -132,7 +132,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
           return;
         }
 
-        // AUTOMATIC DIRECT REDIRECT TO FAPSHI PAYMENT PORTAL
+        // AUTOMATIC DIRECT REDIRECT TO PAYMENT PORTAL
         if (data.link && typeof window !== 'undefined') {
           window.location.href = data.link;
         } else {
@@ -201,7 +201,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                   Soutenir {candidate.firstName}
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
-                  1 Vote = <strong className="text-pink-600 font-extrabold">{unitVotePrice} FCFA</strong> • Redirection directe vers le paiement
+                  1 Vote = <strong className="text-amber-600 font-extrabold">{unitVotePrice} FCFA</strong> • Redirection directe vers le paiement
                 </p>
               </div>
 
@@ -241,7 +241,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                       onClick={() => setVoteCount(count)}
                       className={`py-2.5 rounded-xl font-extrabold text-xs transition-all border ${
                         voteCount === count
-                          ? 'blue-pill-btn text-white border-blue-600 shadow-md scale-105'
+                          ? 'gold-gradient-btn text-slate-950 border-amber-500 shadow-md scale-105'
                           : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
                       }`}
                     >
@@ -270,24 +270,24 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                       onClick={() => setPaymentMethod(method.id as any)}
                       className={`p-3 rounded-xl font-extrabold text-xs flex items-center justify-between border transition-all ${
                         paymentMethod === method.id
-                          ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm ring-2 ring-blue-500/20'
+                          ? 'border-amber-500 bg-amber-50 text-amber-900 shadow-sm ring-2 ring-amber-500/20'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                       }`}
                     >
                       <span>{method.label}</span>
-                      <Smartphone className="w-4 h-4 text-blue-600" />
+                      <Smartphone className="w-4 h-4 text-amber-600" />
                     </button>
                   ))}
                 </div>
 
-                {/* Phone Number Input for direct USSD push */}
+                {/* Phone Number Input */}
                 <div className="pt-1">
                   <input
                     type="tel"
                     placeholder="Numéro Mobile Money (ex: 699000000)"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-mono placeholder-slate-400 focus:outline-none focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-mono placeholder-slate-400 focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
@@ -298,7 +298,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                   <p className="text-[10px] text-slate-500 font-bold uppercase">Montant du Débit</p>
                   <p className="text-xs text-slate-600">{voteCount} vote{voteCount > 1 ? 's' : ''} × {unitVotePrice} FCFA</p>
                 </div>
-                <p className="text-2xl font-black text-pink-600 font-mono">
+                <p className="text-2xl font-black text-amber-600 font-mono">
                   {totalPrice.toLocaleString('fr-FR')} FCFA
                 </p>
               </div>
@@ -306,7 +306,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
               {/* Security Badge */}
               <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Débit sécurisé par Fapshi Gateway</span>
+                <span>Débit sécurisé Mobile Money</span>
               </div>
 
               {/* Action Buttons */}
@@ -323,7 +323,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                   type="button"
                   onClick={handleInitiatePayment}
                   disabled={isSubmitting}
-                  className="pink-blue-gradient-btn py-3 px-4 rounded-xl font-extrabold text-xs text-white shadow-md flex items-center justify-center gap-2"
+                  className="gold-gradient-btn py-3 px-4 rounded-xl font-extrabold text-xs text-slate-950 shadow-md flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -342,7 +342,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
           {step === 'WAITING_PAYMENT' && (
             /* Step 2: Redirecting & Polling State */
             <div className="space-y-6 text-center py-6">
-              <div className="w-20 h-20 rounded-full bg-blue-50 border-2 border-blue-500 mx-auto flex items-center justify-center text-blue-600 shadow-md">
+              <div className="w-20 h-20 rounded-full bg-amber-50 border-2 border-amber-500 mx-auto flex items-center justify-center text-amber-600 shadow-md">
                 <Loader2 className="w-10 h-10 animate-spin" />
               </div>
 
@@ -351,7 +351,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                   Redirection Vers le Portail de Paiement...
                 </h3>
                 <p className="text-sm text-slate-600 max-w-sm mx-auto">
-                  Veuillez valider le débit de <strong className="text-pink-600">{totalPrice} FCFA</strong> sur la page Fapshi pour comptabiliser votre vote.
+                  Veuillez valider le débit de <strong className="text-amber-600">{totalPrice} FCFA</strong> sur la page de paiement pour comptabiliser votre vote.
                 </p>
               </div>
 
@@ -386,7 +386,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                   🎉 Vote Comptabilisé !
                 </h3>
                 <p className="text-sm text-slate-600 mt-2 max-w-xs mx-auto">
-                  Le débit de <strong className="text-pink-600">{totalPrice} FCFA</strong> a été confirmé. <strong className="text-blue-600">{voteCount} vote{voteCount > 1 ? 's' : ''}</strong> {voteCount > 1 ? 'ont été ajoutés' : 'a été ajouté'} à {candidate.firstName} {candidate.lastName}.
+                  Le débit de <strong className="text-amber-600">{totalPrice} FCFA</strong> a été confirmé. <strong className="text-blue-600">{voteCount} vote{voteCount > 1 ? 's' : ''}</strong> {voteCount > 1 ? 'ont été ajoutés' : 'a été ajouté'} à {candidate.firstName} {candidate.lastName}.
                 </p>
               </div>
 
@@ -398,7 +398,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
               <button
                 type="button"
                 onClick={handleCloseAll}
-                className="w-full blue-pill-btn py-3.5 rounded-xl font-extrabold text-sm text-white shadow-md"
+                className="w-full gold-gradient-btn py-3.5 rounded-xl font-extrabold text-sm text-slate-950 shadow-md"
               >
                 Fermer
               </button>
@@ -432,7 +432,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStep('FORM')}
-                  className="flex-1 blue-pill-btn py-3 rounded-xl text-white font-bold text-xs"
+                  className="flex-1 gold-gradient-btn py-3 rounded-xl text-slate-950 font-bold text-xs"
                 >
                   Réessayer
                 </button>
