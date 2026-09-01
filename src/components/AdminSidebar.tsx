@@ -54,26 +54,24 @@ export const AdminSidebar: React.FC = () => {
       <div className="lg:hidden sticky top-0 z-40 bg-white border-b border-amber-200/80 px-4 py-3 flex items-center justify-between font-poppins shadow-xs">
         <Link href="/" className="flex items-center gap-2">
           {!imageError ? (
-            <div className="relative h-8 w-32">
-              <Image
-                src="/images/logo.png"
-                alt="MISS MISTER Logo"
-                fill
-                className="object-contain object-left"
-                onError={() => setImageError(true)}
-              />
-            </div>
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src="/images/logo.png"
+              alt="MISS MISTER Logo"
+              className="h-12 sm:h-14 w-auto object-contain max-w-[200px] scale-110 origin-left"
+              onError={() => setImageError(true)}
+            />
           ) : (
             <span className="font-black text-[#0F172A]">MISS MISTER</span>
           )}
-          <span className="text-[10px] font-black uppercase text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-black uppercase text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full ml-1">
             KERIL ADMIN
           </span>
         </Link>
 
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 rounded-2xl text-slate-800 hover:text-amber-700 bg-amber-50 border border-amber-200"
+          className="p-2.5 rounded-2xl text-slate-800 hover:text-amber-700 bg-amber-50 border border-amber-200"
           aria-label="Menu Admin"
         >
           {isOpen ? <X className="w-6 h-6 text-amber-600" /> : <Menu className="w-6 h-6 text-amber-600" />}
@@ -87,15 +85,13 @@ export const AdminSidebar: React.FC = () => {
         <div className="pb-6 border-b border-slate-100">
           <Link href="/" className="flex flex-col gap-2">
             {!imageError ? (
-              <div className="relative h-10 w-44">
-                <Image
-                  src="/images/logo.png"
-                  alt="MISS MISTER Logo"
-                  fill
-                  className="object-contain object-left"
-                  onError={() => setImageError(true)}
-                />
-              </div>
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src="/images/logo.png"
+                alt="MISS MISTER Logo"
+                className="h-16 w-auto object-contain object-left scale-105 origin-left"
+                onError={() => setImageError(true)}
+              />
             ) : (
               <div className="flex items-center gap-2">
                 <Crown className="w-6 h-6 text-amber-500 fill-amber-400" />
