@@ -21,27 +21,27 @@ export const CompetitionCard: React.FC<CompetitionCardProps> = ({ competition, i
       initial={{ opacity: 0, y: 25 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
-      className="group relative rounded-3xl overflow-hidden bg-[#131A26]/90 backdrop-blur-xl border border-amber-500/25 hover:border-amber-400 transition-all duration-300 shadow-2xl flex flex-col justify-between font-poppins"
+      className="group relative rounded-[2rem] glass-mirror-panel p-3.5 flex flex-col justify-between font-poppins transition-all duration-400"
     >
       {/* Banner & Header Image */}
-      <div className="relative h-56 sm:h-64 w-full overflow-hidden bg-slate-950">
+      <div className="relative h-56 sm:h-64 w-full overflow-hidden rounded-[1.5rem] bg-slate-950">
         <Image
           src={competition.bannerImage}
           alt={competition.title}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          className="object-cover group-hover:scale-108 transition-transform duration-700"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#131A26] via-slate-950/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
 
         {/* Status Badge */}
         <div className="absolute top-4 left-4 flex items-center gap-2">
           <span
-            className={`px-3.5 py-1 rounded-full text-xs font-black tracking-wider uppercase flex items-center gap-1.5 shadow-md ${
+            className={`px-3.5 py-1 rounded-full text-xs font-black tracking-wider uppercase flex items-center gap-1.5 shadow-xl border border-white/30 backdrop-blur-md ${
               isEnCours
-                ? 'bg-emerald-600 text-white'
+                ? 'bg-emerald-600/90 text-white'
                 : competition.status === 'A VENIR'
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-800 text-white'
+                ? 'bg-blue-600/90 text-white'
+                : 'bg-slate-800/90 text-white'
             }`}
           >
             <span
@@ -67,14 +67,14 @@ export const CompetitionCard: React.FC<CompetitionCardProps> = ({ competition, i
         </div>
       </div>
 
-      {/* Body Content */}
-      <div className="p-6 space-y-5 flex-1 flex flex-col justify-between bg-[#131A26] relative z-10">
-        <p className="text-sm text-slate-300 line-clamp-2 leading-relaxed font-medium">
+      {/* ULTRA TRANSPARENT FROSTED GLASS BODY CONTENT */}
+      <div className="mt-3.5 p-6 space-y-5 flex-1 flex flex-col justify-between glass-inner-box text-white">
+        <p className="text-sm text-slate-200 line-clamp-2 leading-relaxed font-medium">
           {competition.description}
         </p>
 
         {/* Countdown Component */}
-        <div className="bg-[#0B0E14] p-3.5 rounded-2xl border border-amber-500/20 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="bg-slate-950/60 backdrop-blur-md p-3.5 rounded-2xl border border-white/20 flex flex-col sm:flex-row items-center justify-between gap-3">
           <span className="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Temps Restant :
           </span>
@@ -83,22 +83,22 @@ export const CompetitionCard: React.FC<CompetitionCardProps> = ({ competition, i
 
         {/* Stats metrics */}
         <div className="grid grid-cols-2 gap-3 pt-2">
-          <div className="bg-[#0B0E14] p-3 rounded-2xl border border-slate-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-slate-800 text-amber-400 flex items-center justify-center">
+          <div className="bg-slate-950/60 backdrop-blur-md p-3 rounded-2xl border border-white/20 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-white/10 text-amber-400 flex items-center justify-center border border-white/20">
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[10px] text-slate-400 uppercase font-black">Candidats</p>
+              <p className="text-[10px] text-slate-300 uppercase font-black">Candidats</p>
               <p className="text-base font-black text-white">{competition.totalCandidates}</p>
             </div>
           </div>
 
-          <div className="bg-[#0B0E14] p-3 rounded-2xl border border-slate-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+          <div className="bg-slate-950/60 backdrop-blur-md p-3 rounded-2xl border border-white/20 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
               <Vote className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[10px] text-slate-400 uppercase font-black">Total Votes</p>
+              <p className="text-[10px] text-slate-300 uppercase font-black">Total Votes</p>
               <p className="text-base font-black text-amber-400">
                 {competition.totalVotes.toLocaleString('fr-FR')}
               </p>
@@ -110,7 +110,7 @@ export const CompetitionCard: React.FC<CompetitionCardProps> = ({ competition, i
         <div className="pt-2">
           <Link
             href={`/competition/${competition.slug}`}
-            className="w-full gold-gradient-btn py-3.5 px-5 rounded-2xl font-black text-xs uppercase tracking-wider text-slate-950 flex items-center justify-center gap-2 shadow-lg group/btn active:scale-95 transition-transform"
+            className="w-full gold-gradient-btn py-3.5 px-5 rounded-2xl font-black text-xs uppercase tracking-wider text-slate-950 flex items-center justify-center gap-2 shadow-xl group/btn active:scale-95 transition-transform"
           >
             <span className="text-slate-950 font-black">Voir la compétition</span>
             <ArrowRight className="w-4 h-4 text-slate-950 group-hover/btn:translate-x-1 transition-transform" />

@@ -7,16 +7,16 @@
 }
 
 /* ========================================================================= */
-/* NEO-TACTILE FROSTED GLASS MIRROR DESIGN SYSTEM (REF: UI KIT SPECIFICATION) */
+/* ULTRA-TRANSPARENT CRYSTAL FROSTED GLASS DESIGN SYSTEM (MAX GLASS & REFLECTION) */
 /* ========================================================================= */
 
 :root {
-  --bg-main: #090D16;
+  --bg-main: #060911;
   --text-main: #FFFFFF;
 }
 
 body {
-  background-color: #090D16;
+  background-color: #060911;
   color: #FFFFFF;
   font-family: 'Poppins', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
@@ -25,106 +25,105 @@ body {
 
 /* Metallic Champagne Gold Gradient Text */
 .gradient-text-gold {
-  background: linear-gradient(135deg, #FDE047 0%, #F59E0B 50%, #D97706 100%);
+  background: linear-gradient(135deg, #FFF066 0%, #F59E0B 50%, #EAB308 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* 1. NEO-TACTILE FROSTED GLASS MIRROR PANEL (MAIN CARDS & CONTAINERS) */
+/* 1. HUGE ULTRA-TRANSPARENT FROSTED GLASS PANELS */
 .glass-card-theme, .glass-mirror-panel {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(28px) saturate(190%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  border-top-color: rgba(255, 255, 255, 0.4) !important;
-  border-left-color: rgba(255, 255, 255, 0.4) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(40px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(220%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
+  border-top-color: rgba(255, 255, 255, 0.65) !important;
+  border-left-color: rgba(255, 255, 255, 0.65) !important;
   box-shadow: 
-    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.35),
-    0 20px 50px -10px rgba(0, 0, 0, 0.65),
-    0 0 25px -5px rgba(6, 182, 212, 0.15) !important;
-  border-radius: 1.75rem;
+    inset 0 2px 4px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -2px 4px 0 rgba(0, 0, 0, 0.3),
+    0 30px 70px -10px rgba(0, 0, 0, 0.8),
+    0 0 40px 0 rgba(6, 182, 212, 0.2) !important;
+  border-radius: 2rem;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card-theme:hover, .glass-mirror-panel:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(245, 158, 11, 0.45) !important;
-  border-top-color: rgba(255, 255, 255, 0.6) !important;
-  border-left-color: rgba(255, 255, 255, 0.6) !important;
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(245, 158, 11, 0.6) !important;
+  border-top-color: rgba(255, 255, 255, 0.85) !important;
+  border-left-color: rgba(255, 255, 255, 0.85) !important;
   box-shadow: 
-    inset 0 2px 2px 0 rgba(255, 255, 255, 0.5),
-    0 25px 60px -10px rgba(245, 158, 11, 0.25),
-    0 0 35px 0 rgba(6, 182, 212, 0.25) !important;
-  transform: translateY(-4px);
+    inset 0 3px 6px 0 rgba(255, 255, 255, 0.65),
+    0 35px 80px -10px rgba(245, 158, 11, 0.35),
+    0 0 50px 0 rgba(6, 182, 212, 0.35) !important;
+  transform: translateY(-6px) scale(1.01);
 }
 
-/* 2. INNER GLASS CONTAINER (LIGHT INNER BLOCKS INSIDE GLASS CARDS) */
+/* 2. INNER GLASS CONTAINER (TRANSPARENT FROSTED GLASS BOX) */
 .glass-inner-box {
-  background: rgba(255, 255, 255, 0.95);
-  color: #0F172A;
-  border-radius: 1.25rem;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06), 0 10px 25px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.07) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-top-color: rgba(255, 255, 255, 0.5) !important;
+  border-left-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.35), 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+  border-radius: 1.5rem;
 }
 
-.glass-inner-dark {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-top-color: rgba(255, 255, 255, 0.3);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
-}
-
-/* 3. NEO-TACTILE BUTTONS (GOLD & BLUE PILLS WITH INNER GLOW) */
+/* 3. TRANSPARENT GLASS BUTTONS & PILLS */
 .gold-gradient-btn {
-  background: linear-gradient(135deg, #FDE047 0%, #F59E0B 50%, #D97706 100%) !important;
-  color: #090D16 !important;
+  background: linear-gradient(135deg, rgba(253, 224, 71, 0.95) 0%, rgba(245, 158, 11, 0.95) 50%, rgba(217, 119, 6, 0.95) 100%) !important;
+  color: #060911 !important;
   font-weight: 900 !important;
-  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
   box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.6),
-    0 10px 25px -4px rgba(245, 158, 11, 0.45) !important;
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.8),
+    0 12px 30px -4px rgba(245, 158, 11, 0.55) !important;
+  backdrop-filter: blur(12px) !important;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .gold-gradient-btn:hover {
   background: linear-gradient(135deg, #FFFFFF 0%, #F59E0B 50%, #B45309 100%) !important;
   box-shadow: 
-    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.8),
-    0 15px 35px -4px rgba(245, 158, 11, 0.6) !important;
+    inset 0 2px 4px 0 rgba(255, 255, 255, 0.9),
+    0 18px 40px -4px rgba(245, 158, 11, 0.75) !important;
   transform: translateY(-2px) scale(1.02);
 }
 
 .blue-pill-btn {
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
+  background: rgba(37, 99, 235, 0.25) !important;
+  backdrop-filter: blur(20px) !important;
   color: #FFFFFF !important;
   font-weight: 900 !important;
   border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-top-color: rgba(255, 255, 255, 0.7) !important;
   box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.5),
-    0 10px 25px -4px rgba(37, 99, 235, 0.45) !important;
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.5),
+    0 12px 30px -4px rgba(37, 99, 235, 0.5) !important;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .blue-pill-btn:hover {
-  background: linear-gradient(135deg, #60A5FA 0%, #1D4ED8 100%) !important;
+  background: rgba(37, 99, 235, 0.45) !important;
   box-shadow: 
-    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.7),
-    0 15px 35px -4px rgba(37, 99, 235, 0.6) !important;
+    inset 0 2px 4px 0 rgba(255, 255, 255, 0.8),
+    0 18px 40px -4px rgba(37, 99, 235, 0.7) !important;
   transform: translateY(-2px);
 }
 
-/* 4. AMBIENT GLOW ORBS BEHIND FROSTED GLASS MIRROR PANELS */
+/* 4. INTENSE VIBRANT AMBIENT LIGHT ORBS (ILLUMINATES FROSTED GLASS BACKDROP) */
 .ambient-orb-gold {
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0) 70%);
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0) 70%);
 }
 
 .ambient-orb-cyan {
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, rgba(6, 182, 212, 0) 70%);
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.35) 0%, rgba(6, 182, 212, 0) 70%);
 }
 
-.ambient-orb-blue {
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.22) 0%, rgba(37, 99, 235, 0) 70%);
+.ambient-orb-magenta {
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, rgba(236, 72, 153, 0) 70%);
 }
 
 /* Smooth Custom Scrollbar */
@@ -132,9 +131,9 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #090D16;
+  background: #060911;
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #F59E0B, #3B82F6);
+  background: linear-gradient(180deg, #F59E0B, #06B6D4);
   border-radius: 9999px;
 }
