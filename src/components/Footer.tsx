@@ -9,7 +9,7 @@ export const Footer: React.FC = () => {
     <footer className="bg-[#07090e] border-t border-amber-500/25 text-slate-400 font-poppins pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
           {/* Brand Info */}
           <div className="space-y-4 md:col-span-1">
@@ -28,24 +28,14 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Public Quick Links */}
           <div className="space-y-3">
             <h4 className="text-xs font-black uppercase text-amber-400 tracking-widest">Navigation</h4>
             <ul className="space-y-2 text-xs font-semibold">
               <li><Link href="/" className="hover:text-amber-400 transition-colors">Accueil</Link></li>
-              <li><Link href="/competitions" className="hover:text-amber-400 transition-colors">Compétitions</Link></li>
+              <li><Link href="/competitions" className="hover:text-amber-400 transition-colors">Compétitions Officielle</Link></li>
               <li><Link href="/classement" className="hover:text-amber-400 transition-colors">Classement En Direct</Link></li>
-              <li><Link href="/resultats" className="hover:text-amber-400 transition-colors">Résultats</Link></li>
-            </ul>
-          </div>
-
-          {/* Confidential Admin Route */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-black uppercase text-amber-400 tracking-widest">Espace Organisateur</h4>
-            <ul className="space-y-2 text-xs font-semibold">
-              <li><Link href="/keril" className="hover:text-amber-400 transition-colors">Connexion Espace /keril</Link></li>
-              <li><Link href="/keril/competitions" className="hover:text-amber-400 transition-colors">Gestion des Compétitions</Link></li>
-              <li><Link href="/keril/candidates" className="hover:text-amber-400 transition-colors">Gestion des Candidats</Link></li>
+              <li><Link href="/resultats" className="hover:text-amber-400 transition-colors">Analytiques & Résultats</Link></li>
             </ul>
           </div>
 
