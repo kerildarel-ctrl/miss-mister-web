@@ -86,17 +86,17 @@ export const VoteModal: React.FC<VoteModalProps> = ({
     }
   };
 
-  // Automatic Polling to verify Mobile Money debit status (every 2s)
+  // Automatic Polling to verify Mobile Money debit status (every 8s to respect gateway rate limits)
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
     if (step === 'WAITING_DIRECT_PAY' && transId) {
       // Immediate initial check
       verifyStatus();
-      // Regular polling
+      // Regular polling every 8s
       timer = setInterval(() => {
         verifyStatus();
-      }, 2000);
+      }, 8000);
     }
 
     return () => {
@@ -378,11 +378,27 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                 </p>
               </div>
 
-              <div className="pt-2">
+              <div className="space-y-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => verifyStatus()}
+                  disabled={isCheckingStatus}
+                  className="w-full gold-gradient-btn py-3.5 px-4 rounded-xl font-black text-xs text-slate-950 shadow-xl flex items-center justify-center gap-2 uppercase tracking-wider"
+                >
+                  {isCheckingStatus ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4 text-slate-950" />
+                      <span>Vérifier le statut du paiement</span>
+                    </>
+                  )}
+                </button>
+
                 <button
                   type="button"
                   onClick={handleCloseAll}
-                  className="py-2.5 px-6 rounded-xl glass-inner-box text-slate-300 hover:text-white font-bold text-xs border border-white/20"
+                  className="w-full py-2.5 px-6 rounded-xl glass-inner-box text-slate-300 hover:text-white font-bold text-xs border border-white/20"
                 >
                   Annuler la transaction
                 </button>

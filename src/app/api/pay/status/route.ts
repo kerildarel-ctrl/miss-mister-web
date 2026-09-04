@@ -26,6 +26,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const transId = searchParams.get('transId');
     const voteId = searchParams.get('voteId');
+    const candidateId = searchParams.get('candidateId');
+    const countStr = searchParams.get('count');
 
     if (!transId) {
       return NextResponse.json({ success: false, error: 'transId manquant' }, { status: 400 });
@@ -39,7 +41,31 @@ export async function GET(request: Request) {
     let isSuccess = false;
     let rawFapshiData: any = null;
 
-    // 1. VERIFY PAYMENT WITH FAPSHI GATEWAY
+    // STEP 1: CHECK SUPABASE DB FIRST (If Webhook or previous request already confirmed it)
+    if (voteId) {
+      try {
+        const supabase = getSupabaseAdmin();
+        const { data: vote } = await supabase
+          .from('votes')
+          .select('*')
+          .eq('id', voteId)
+          .single();
+
+        if (vote && vote.payment_status === 'SUCCESSFUL') {
+          return NextResponse.json({
+            success: true,
+            transId: transId,
+            status: 'SUCCESSFUL',
+            isSuccess: true,
+            message: 'Paiement confirmé via Webhook ! Vote comptabilisé.'
+          });
+        }
+      } catch {
+        // Fallthrough to Fapshi API check
+      }
+    }
+
+    // STEP 2: VERIFY PAYMENT WITH FAPSHI GATEWAY
     if (!transId.startsWith('sim_')) {
       try {
         const fapshiResponse = await fetch(`${fapshiBaseUrl}/payment-status/${transId}`, {
@@ -51,8 +77,9 @@ export async function GET(request: Request) {
           cache: 'no-store'
         });
 
+        rawFapshiData = await fapshiResponse.json();
+
         if (fapshiResponse.ok) {
-          rawFapshiData = await fapshiResponse.json();
           paymentStatus = (rawFapshiData.status || rawFapshiData.paymentStatus || 'PENDING').toUpperCase();
 
           // ONLY explicit successful status codes from Fapshi count as success
@@ -62,6 +89,11 @@ export async function GET(request: Request) {
             paymentStatus === 'CONFIRMED' ||
             paymentStatus === 'COMPLETED' ||
             paymentStatus === 'PAID';
+        } else {
+          // If rate-limited (HTTP 429), keep status as PENDING without throwing an error
+          if (rawFapshiData?.message && rawFapshiData.message.includes('Too many requests')) {
+            console.warn(`[STATUS API] Rate limit hit for ${transId}. Waiting for next window.`);
+          }
         }
       } catch (err) {
         console.error('[STATUS API] Fapshi status fetch error:', err);
@@ -72,7 +104,7 @@ export async function GET(request: Request) {
       isSuccess = true;
     }
 
-    // 2. INCREMENT VOTE COUNT WHEN CONFIRMED
+    // STEP 3: INCREMENT VOTE COUNT WHEN CONFIRMED
     if (isSuccess && voteId) {
       try {
         const supabase = getSupabaseAdmin();
@@ -109,17 +141,9 @@ export async function GET(request: Request) {
             // Update candidate score on server disk JSON
             updateDiskCandidateVote(vote.candidate_id, vote.vote_count || 1);
           }
-        } else if (!vote) {
+        } else if (!vote && candidateId) {
           // Fallback if vote record wasn't found in DB
-          const parts = voteId.split('_');
-          if (parts.length >= 2) {
-            // Update disk candidate directly
-            const candidateId = searchParams.get('candidateId');
-            const countStr = searchParams.get('count');
-            if (candidateId) {
-              updateDiskCandidateVote(candidateId, parseInt(countStr || '1', 10));
-            }
-          }
+          updateDiskCandidateVote(candidateId, parseInt(countStr || '1', 10));
         }
       } catch (err) {
         console.error('[STATUS API] DB update error:', err);
