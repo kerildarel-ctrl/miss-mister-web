@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     const voteId = `vote_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     
-    // EXACT ACTIVE FAPSHI CREDENTIALS
+    // FAPSHI API CREDENTIALS
     const fapshiApiUser = process.env.FAPSHI_API_USER || '2aa10fd5-e2e0-4f94-bc2f-01585657f418';
     const fapshiApiKey = process.env.FAPSHI_API_KEY || 'FAK_f8e3d6d682775ca2f34e34c80da6ccc6';
     const fapshiBaseUrl = process.env.FAPSHI_BASE_URL || 'https://live.fapshi.com';
@@ -46,8 +46,9 @@ export async function POST(request: Request) {
     }
 
     // 2. FAPSHI DIRECT PAY (USSD Push Prompt directly to phone screen)
+    // NOTE: Fapshi auto-detects Orange Money vs MTN Mobile Money from phone number prefix. Do NOT pass 'medium' field.
     if (cleanPhone && cleanPhone.length === 9) {
-      console.log(`Calling Fapshi Direct Pay with user ${fapshiApiUser} for phone ${cleanPhone}...`);
+      console.log(`Calling Fapshi Direct Pay for phone: ${cleanPhone}, amount: ${amount}`);
       
       const directPayRes = await fetch(`${fapshiBaseUrl}/direct-pay`, {
         method: 'POST',
@@ -59,7 +60,6 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           amount: Number(amount),
           phone: cleanPhone,
-          medium: paymentMethod === 'orange' ? 'OM' : 'MOMO',
           userId: candidateId,
           externalId: voteId,
           webhookUrl: `${siteUrl}/api/pay/webhook`,
