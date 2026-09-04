@@ -36,6 +36,8 @@ export async function GET(request: Request) {
     const fapshiBaseUrl = process.env.FAPSHI_BASE_URL || 'https://live.fapshi.com';
 
     let paymentStatus = 'PENDING';
+    let isSuccess = false;
+    let rawFapshiData: any = null;
 
     // 1. STRICT PAYMENT VERIFICATION WITH FAPSHI GATEWAY
     if (!transId.startsWith('sim_')) {
@@ -49,17 +51,25 @@ export async function GET(request: Request) {
       });
 
       if (fapshiResponse.ok) {
-        const fapshiData = await fapshiResponse.json();
-        paymentStatus = fapshiData.status || fapshiData.paymentStatus || 'PENDING';
+        rawFapshiData = await fapshiResponse.json();
+        paymentStatus = (rawFapshiData.status || rawFapshiData.paymentStatus || 'PENDING').toUpperCase();
+        
+        // Comprehensive check for any positive payment confirmation signal from Fapshi
+        isSuccess = 
+          paymentStatus === 'SUCCESSFUL' ||
+          paymentStatus === 'SUCCESS' ||
+          paymentStatus === 'CONFIRMED' ||
+          paymentStatus === 'COMPLETED' ||
+          paymentStatus === 'PAID' ||
+          (rawFapshiData.dateConfirmed !== null && rawFapshiData.dateConfirmed !== undefined && paymentStatus !== 'FAILED' && paymentStatus !== 'EXPIRED');
       }
     } else {
       // Simulation mode fallback for testing
       paymentStatus = 'SUCCESSFUL';
+      isSuccess = true;
     }
 
-    const isSuccess = paymentStatus === 'SUCCESSFUL';
-
-    // 2. ONLY INCREMENT VOTE COUNT IF PAYMENT IS STRICTLY SUCCESSFUL & DEDUCTED
+    // 2. ONLY INCREMENT VOTE COUNT IF PAYMENT IS CONFIRMED SUCCESSFUL
     if (isSuccess && voteId) {
       try {
         const supabase = getSupabaseAdmin();
@@ -107,6 +117,7 @@ export async function GET(request: Request) {
       transId: transId,
       status: paymentStatus,
       isSuccess: isSuccess,
+      raw: rawFapshiData,
       message: isSuccess
         ? 'Paiement déduit avec succès. Vote comptabilisé !'
         : 'Paiement en attente de confirmation Mobile Money.'

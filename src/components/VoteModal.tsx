@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Candidate } from '@/data/mockData';
 import { getCompetitions } from '@/services/dbService';
-import { X, Vote, CheckCircle2, Smartphone, Sparkles, ShieldCheck, Loader2, AlertTriangle, PhoneCall } from 'lucide-react';
+import { X, Vote, CheckCircle2, Smartphone, Sparkles, ShieldCheck, Loader2, AlertTriangle, PhoneCall, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface VoteModalProps {
@@ -26,6 +26,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
   // Payment Flow States: FORM -> WAITING_DIRECT_PAY / REDIRECTING -> SUCCESS / FAILED
   const [step, setStep] = useState<'FORM' | 'WAITING_DIRECT_PAY' | 'REDIRECTING' | 'SUCCESS' | 'FAILED'>('FORM');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [transId, setTransId] = useState<string | null>(null);
   const [voteId, setVoteId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -47,51 +48,58 @@ export const VoteModal: React.FC<VoteModalProps> = ({
     }
   }, [isOpen, candidate]);
 
-  // Automatic Polling to verify Mobile Money debit status in real-time
+  // Function to perform status verification
+  const checkPaymentStatus = async () => {
+    if (!transId) return;
+    setIsCheckingStatus(true);
+
+    try {
+      const res = await fetch(`/api/pay/status?transId=${transId}&voteId=${voteId || ''}`, { cache: 'no-store' });
+      const data = await res.json();
+
+      if (data.isSuccess) {
+        setStep('SUCCESS');
+        onConfirmVote(candidate?.id || '', voteCount);
+
+        try {
+          if (typeof window !== 'undefined') {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const confetti = require('canvas-confetti');
+            confetti({
+              particleCount: 140,
+              spread: 90,
+              origin: { y: 0.6 },
+              colors: ['#F59E0B', '#3B82F6', '#10B981', '#EC4899']
+            });
+          }
+        } catch {
+          // Fallback
+        }
+      } else if (data.status === 'FAILED' || data.status === 'EXPIRED') {
+        setErrorMessage('Le paiement a été refusé ou a expiré sur votre téléphone. Aucun compte n’a été débité.');
+        setStep('FAILED');
+      }
+    } catch {
+      // Continue
+    } finally {
+      setIsCheckingStatus(false);
+    }
+  };
+
+  // Automatic Polling to verify Mobile Money debit status in real-time (every 1.8s)
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
     if (step === 'WAITING_DIRECT_PAY' && transId) {
-      timer = setInterval(async () => {
-        try {
-          const res = await fetch(`/api/pay/status?transId=${transId}&voteId=${voteId || ''}`, { cache: 'no-store' });
-          const data = await res.json();
-
-          if (data.isSuccess) {
-            // MONEY CONFIRMED DEDUCTED ON PHONE!
-            clearInterval(timer);
-            setStep('SUCCESS');
-            onConfirmVote(candidate?.id || '', voteCount);
-
-            try {
-              if (typeof window !== 'undefined') {
-                // eslint-disable-next-line @typescript-eslint/no-require-imports
-                const confetti = require('canvas-confetti');
-                confetti({
-                  particleCount: 140,
-                  spread: 90,
-                  origin: { y: 0.6 },
-                  colors: ['#F59E0B', '#3B82F6', '#10B981', '#EC4899']
-                });
-              }
-            } catch {
-              // Fallback
-            }
-          } else if (data.status === 'FAILED' || data.status === 'EXPIRED') {
-            clearInterval(timer);
-            setErrorMessage('Le paiement a été refusé ou a expiré sur votre téléphone. Aucun compte n’a été débité.');
-            setStep('FAILED');
-          }
-        } catch {
-          // Continue polling
-        }
-      }, 2500);
+      timer = setInterval(() => {
+        checkPaymentStatus();
+      }, 1800);
     }
 
     return () => {
       if (timer) clearInterval(timer);
     };
-  }, [step, transId, voteId, candidate, voteCount, onConfirmVote]);
+  }, [step, transId, voteId, candidate, voteCount]);
 
   if (!isOpen || !candidate) return null;
 
@@ -338,7 +346,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
           )}
 
           {step === 'WAITING_DIRECT_PAY' && (
-            /* Step 2: Fapshi Direct Pay USSD Prompt Waiting State */
+            /* Step 2: Fapshi Direct Pay USSD Prompt Waiting State + Manual Trigger Button */
             <div className="space-y-6 text-center py-6">
               <div className="w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-400 mx-auto flex items-center justify-center text-amber-400 shadow-2xl animate-pulse">
                 <PhoneCall className="w-10 h-10 text-amber-400 animate-bounce" />
@@ -357,23 +365,43 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                 </p>
               </div>
 
-              <div className="glass-inner-box p-4 rounded-2xl border border-white/30 text-xs text-slate-200 font-semibold space-y-2 text-left">
+              <div className="glass-inner-box p-4 rounded-2xl border border-white/30 text-xs text-slate-200 font-semibold space-y-3 text-left">
                 <div className="flex items-center gap-2 font-black text-amber-400">
                   <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
-                  <span>En attente de la saisie de votre code secret...</span>
+                  <span>Vérification automatique du statut de débit...</span>
                 </div>
                 <p className="text-[11px] text-slate-300 leading-normal">
                   Saisissez votre code secret Mobile Money sur votre téléphone (ou composez le <strong>*126#</strong> / <strong>#150*50#</strong> si la notification n&apos;apparaît pas).
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={handleCloseAll}
-                className="py-2.5 px-6 rounded-xl glass-inner-box text-slate-300 hover:text-white font-bold text-xs"
-              >
-                Annuler la transaction
-              </button>
+              {/* Interactive Manual Status Check Button */}
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={checkPaymentStatus}
+                  disabled={isCheckingStatus}
+                  className="w-full gold-gradient-btn py-3.5 px-4 rounded-2xl font-black text-xs text-slate-950 shadow-xl flex items-center justify-center gap-2 uppercase tracking-wider"
+                >
+                  {isCheckingStatus ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4 text-slate-950" />
+                      <span>J&apos;AI VALIDÉ SUR MON TÉLÉPHONE 🚀</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCloseAll}
+                  className="py-2.5 px-6 rounded-xl glass-inner-box text-slate-300 hover:text-white font-bold text-xs border border-white/10"
+                >
+                  Annuler la transaction
+                </button>
+              </div>
+
             </div>
           )}
 
