@@ -15,12 +15,14 @@ export async function POST(request: Request) {
     } = body;
 
     const voteId = `vote_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const fapshiApiUser = process.env.FAPSHI_API_USER;
-    const fapshiApiKey = process.env.FAPSHI_API_KEY;
+    
+    // FAPSHI API CREDENTIALS (With guaranteed fallback values for Netlify)
+    const fapshiApiUser = process.env.FAPSHI_API_USER || '2aa10fd5-e2e0-4f94-bc2f-01585657f418';
+    const fapshiApiKey = process.env.FAPSHI_API_KEY || 'FAK_33a74dc61c2d8b6046d9ab212d375885';
     const fapshiBaseUrl = process.env.FAPSHI_BASE_URL || 'https://live.fapshi.com';
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://miss-mister-web.netlify.app';
 
-    // Format and clean phone number (remove spaces, +237, etc.)
+    // Format phone number to clean 9 digits (e.g., 699000000 or 670000000)
     const cleanPhone = phone ? phone.replace(/[^0-9]/g, '').slice(-9) : '';
 
     // 1. Record pending vote in Supabase
@@ -43,96 +45,90 @@ export async function POST(request: Request) {
       // Continue even if Supabase table is not created yet
     }
 
-    // 2. Call Fapshi Payment Gateway API (Direct Pay vs Hosted Checkout)
-    if (fapshiApiUser && fapshiApiKey) {
-      
-      // OPTION A: DIRECT PAY (If phone number is provided)
-      if (cleanPhone && cleanPhone.length === 9) {
-        try {
-          const directPayRes = await fetch(`${fapshiBaseUrl}/direct-pay`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apiuser': fapshiApiUser,
-              'apikey': fapshiApiKey
-            },
-            body: JSON.stringify({
-              amount: amount,
-              phone: cleanPhone,
-              medium: paymentMethod === 'orange' ? 'OM' : 'MOMO',
-              userId: candidateId,
-              externalId: voteId,
-              webhookUrl: `${siteUrl}/api/pay/webhook`,
-              message: `Vote MISS MISTER (${voteCount} vote(s)) pour ${candidateName}`,
-              email: 'voter@missmister.com'
-            })
-          });
-
-          const directPayData = await directPayRes.json();
-
-          if (directPayRes.ok && (directPayData.transId || directPayData.id)) {
-            return NextResponse.json({
-              success: true,
-              directPay: true,
-              voteId: voteId,
-              transId: directPayData.transId || directPayData.id,
-              phone: cleanPhone,
-              message: 'Un prompt de confirmation a été envoyé directement sur votre téléphone.'
-            });
-          }
-        } catch {
-          // Fallback to initiate-pay if direct-pay fails
-        }
-      }
-
-      // OPTION B: HOSTED CHECKOUT PAY LINK (Fallback or when no phone is provided)
-      const fapshiResponse = await fetch(`${fapshiBaseUrl}/initiate-pay`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apiuser': fapshiApiUser,
-          'apikey': fapshiApiKey
-        },
-        body: JSON.stringify({
-          amount: amount,
-          email: 'voter@missmister.com',
-          userId: candidateId,
-          externalId: voteId,
-          redirectUrl: `${siteUrl}/competition/${competitionSlug}`,
-          webhookUrl: `${siteUrl}/api/pay/webhook`,
-          message: `Vote MISS MISTER (${voteCount} vote(s)) pour ${candidateName}`,
-          serviceName: 'MISS MISTER',
-          phone: cleanPhone || undefined
-        })
-      });
-
-      const fapshiData = await fapshiResponse.json();
-
-      if (fapshiResponse.ok && (fapshiData.link || fapshiData.transId)) {
-        return NextResponse.json({
-          success: true,
-          directPay: false,
-          voteId: voteId,
-          transId: fapshiData.transId || fapshiData.id,
-          link: fapshiData.link,
-          message: 'Paiement Fapshi initialisé avec succès.'
+    // 2. FAPSHI DIRECT PAY (USSD Push Prompt directly to phone screen)
+    if (cleanPhone && cleanPhone.length === 9) {
+      try {
+        console.log(`Calling Fapshi Direct Pay for phone: ${cleanPhone}, amount: ${amount}`);
+        const directPayRes = await fetch(`${fapshiBaseUrl}/direct-pay`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apiuser': fapshiApiUser,
+            'apikey': fapshiApiKey
+          },
+          body: JSON.stringify({
+            amount: Number(amount),
+            phone: cleanPhone,
+            medium: paymentMethod === 'orange' ? 'OM' : 'MOMO',
+            userId: candidateId,
+            externalId: voteId,
+            webhookUrl: `${siteUrl}/api/pay/webhook`,
+            message: `Vote MISS MISTER (${voteCount} vote(s)) pour ${candidateName}`,
+            email: 'voter@missmister.com'
+          })
         });
+
+        const directPayData = await directPayRes.json();
+        console.log('Fapshi Direct Pay API response:', directPayData);
+
+        if (directPayRes.ok && (directPayData.transId || directPayData.id)) {
+          return NextResponse.json({
+            success: true,
+            directPay: true,
+            voteId: voteId,
+            transId: directPayData.transId || directPayData.id,
+            phone: cleanPhone,
+            message: 'Un prompt de confirmation a été envoyé directement sur votre téléphone.'
+          });
+        }
+      } catch (err: any) {
+        console.error('Direct Pay Error:', err);
       }
     }
 
-    // Fallback response for instant demo simulation when API keys are not set
-    return NextResponse.json({
-      success: true,
-      directPay: true,
-      voteId: voteId,
-      transId: `sim_${voteId}`,
-      link: null,
-      message: 'Vote enregistré en mode simulation.'
+    // 3. FAPSHI HOSTED CHECKOUT LINK (Fallback when no phone is entered)
+    const fapshiResponse = await fetch(`${fapshiBaseUrl}/initiate-pay`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apiuser': fapshiApiUser,
+        'apikey': fapshiApiKey
+      },
+      body: JSON.stringify({
+        amount: Number(amount),
+        email: 'voter@missmister.com',
+        userId: candidateId,
+        externalId: voteId,
+        redirectUrl: `${siteUrl}/competition/${competitionSlug}`,
+        webhookUrl: `${siteUrl}/api/pay/webhook`,
+        message: `Vote MISS MISTER (${voteCount} vote(s)) pour ${candidateName}`,
+        serviceName: 'MISS MISTER',
+        phone: cleanPhone || undefined
+      })
     });
+
+    const fapshiData = await fapshiResponse.json();
+
+    if (fapshiResponse.ok && (fapshiData.link || fapshiData.transId)) {
+      return NextResponse.json({
+        success: true,
+        directPay: false,
+        voteId: voteId,
+        transId: fapshiData.transId || fapshiData.id,
+        link: fapshiData.link,
+        message: 'Paiement Fapshi initialisé avec succès.'
+      });
+    }
+
+    // Fallback error if Fapshi returns non-ok
+    return NextResponse.json({
+      success: false,
+      error: fapshiData?.message || fapshiData?.error || 'Erreur lors de l’initialisation du paiement Fapshi.'
+    }, { status: 400 });
 
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, error: error.message || 'Erreur lors de l’initialisation du vote' },
+      { success: false, error: error.message || 'Erreur serveur lors du paiement' },
       { status: 500 }
     );
   }
