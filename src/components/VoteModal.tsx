@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Candidate } from '@/data/mockData';
 import { getCompetitions } from '@/services/dbService';
-import { X, Vote, CheckCircle2, Smartphone, Sparkles, ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
+import { X, Vote, CheckCircle2, Smartphone, Sparkles, ShieldCheck, Loader2, AlertTriangle, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface VoteModalProps {
@@ -281,7 +281,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                 </div>
 
                 {/* Phone Number Input */}
-                <div className="pt-1">
+                <div className="pt-1 space-y-1.5">
                   <input
                     type="tel"
                     placeholder="Numéro Mobile Money (ex: 699000000)"
@@ -289,6 +289,14 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-mono placeholder-slate-400 focus:outline-none focus:border-amber-500"
                   />
+                  <div className="flex items-center gap-1.5 text-[11px] text-amber-800 bg-amber-50 p-2 rounded-xl border border-amber-200 font-medium">
+                    <Info className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                    <span>
+                      {paymentMethod === 'orange'
+                        ? 'Pour Orange Money : Composez #150*50# sur votre téléphone pour valider le débit.'
+                        : 'Pour MTN : Validez la notification USSD ou composez *126#.'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
