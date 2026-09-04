@@ -15,8 +15,8 @@ export async function POST(request: Request) {
     } = body;
 
     const voteId = `vote_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const fapshiApiUser = process.env.FAPSHI_API_USER;
-    const fapshiApiKey = process.env.FAPSHI_API_KEY;
+    const fapshiApiUser = process.env.FAPSHI_API_USER || '2aa10fd5-e2e0-4f94-bc2f-01585657f418';
+    const fapshiApiKey = process.env.FAPSHI_API_KEY || 'FAK_f8e3d6d682775ca2f34e34c80da6ccc6';
     const fapshiBaseUrl = process.env.FAPSHI_BASE_URL || 'https://live.fapshi.com';
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
           voteId: voteId,
           transId: fapshiData.transId || fapshiData.id,
           link: fapshiData.link,
-          message: 'Paiement Fapshi initialisé avec succès.'
+          message: 'Paiement initialisé avec succès.'
         });
       }
     }
