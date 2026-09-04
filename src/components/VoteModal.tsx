@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Candidate } from '@/data/mockData';
 import { getCompetitions } from '@/services/dbService';
-import { X, Vote, CheckCircle2, Smartphone, Sparkles, ShieldCheck, Loader2, AlertTriangle } from 'lucide-react';
+import { X, Vote, CheckCircle2, Smartphone, Sparkles, ShieldCheck, Loader2, AlertTriangle, PhoneCall } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface VoteModalProps {
@@ -24,8 +24,8 @@ export const VoteModal: React.FC<VoteModalProps> = ({
   const [paymentMethod, setPaymentMethod] = useState<'orange' | 'mtn'>('orange');
   const [phoneNumber, setPhoneNumber] = useState('');
   
-  // Payment Flow States
-  const [step, setStep] = useState<'FORM' | 'WAITING_PAYMENT' | 'SUCCESS' | 'FAILED'>('FORM');
+  // Payment Flow States: FORM -> WAITING_DIRECT_PAY / REDIRECTING -> SUCCESS / FAILED
+  const [step, setStep] = useState<'FORM' | 'WAITING_DIRECT_PAY' | 'REDIRECTING' | 'SUCCESS' | 'FAILED'>('FORM');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [transId, setTransId] = useState<string | null>(null);
   const [voteId, setVoteId] = useState<string | null>(null);
@@ -48,18 +48,18 @@ export const VoteModal: React.FC<VoteModalProps> = ({
     }
   }, [isOpen, candidate]);
 
-  // Automatic Polling to verify Mobile Money debit status
+  // Automatic Polling to verify Mobile Money debit status in real-time
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
-    if (step === 'WAITING_PAYMENT' && transId) {
+    if (step === 'WAITING_DIRECT_PAY' && transId) {
       timer = setInterval(async () => {
         try {
           const res = await fetch(`/api/pay/status?transId=${transId}&voteId=${voteId || ''}`, { cache: 'no-store' });
           const data = await res.json();
 
           if (data.isSuccess) {
-            // MONEY CONFIRMED DEDUCTED!
+            // MONEY CONFIRMED DEDUCTED ON PHONE!
             clearInterval(timer);
             setStep('SUCCESS');
             onConfirmVote(candidate?.id || '', voteCount);
@@ -69,10 +69,10 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                 // eslint-disable-next-line @typescript-eslint/no-require-imports
                 const confetti = require('canvas-confetti');
                 confetti({
-                  particleCount: 120,
-                  spread: 80,
+                  particleCount: 140,
+                  spread: 90,
                   origin: { y: 0.6 },
-                  colors: ['#EC4899', '#2563EB', '#8B5CF6', '#10B981']
+                  colors: ['#F59E0B', '#3B82F6', '#10B981', '#EC4899']
                 });
               }
             } catch {
@@ -80,13 +80,13 @@ export const VoteModal: React.FC<VoteModalProps> = ({
             }
           } else if (data.status === 'FAILED' || data.status === 'EXPIRED') {
             clearInterval(timer);
-            setErrorMessage('Le paiement a été refusé ou a expiré. Aucun compte n’a été débité.');
+            setErrorMessage('Le paiement a été refusé ou a expiré sur votre téléphone. Aucun compte n’a été débité.');
             setStep('FAILED');
           }
         } catch {
           // Continue polling
         }
-      }, 3000);
+      }, 2500);
     }
 
     return () => {
@@ -98,8 +98,13 @@ export const VoteModal: React.FC<VoteModalProps> = ({
 
   const totalPrice = voteCount * unitVotePrice;
 
-  // Initiate Payment & AUTOMATICALLY REDIRECT TO PAYMENT PORTAL
+  // Initiate Fapshi Direct Pay (USSD Prompt) or Link Fallback
   const handleInitiatePayment = async () => {
+    if (!phoneNumber || phoneNumber.trim().length < 9) {
+      setErrorMessage('Veuillez saisir un numéro de téléphone valide à 9 chiffres (ex: 699000000).');
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMessage(null);
 
@@ -123,21 +128,24 @@ export const VoteModal: React.FC<VoteModalProps> = ({
       if (data.success) {
         setTransId(data.transId);
         setVoteId(data.voteId);
+        setIsSubmitting(false);
 
-        // Simulation Mode
+        // Simulation Mode (for testing without live keys)
         if (data.transId && data.transId.startsWith('sim_')) {
-          setIsSubmitting(false);
           setStep('SUCCESS');
           onConfirmVote(candidate.id, voteCount);
           return;
         }
 
-        // AUTOMATIC DIRECT REDIRECT TO PAYMENT PORTAL
-        if (data.link && typeof window !== 'undefined') {
+        // Direct Pay (Fapshi USSD Push prompt sent to user's phone!)
+        if (data.directPay) {
+          setStep('WAITING_DIRECT_PAY');
+        } else if (data.link && typeof window !== 'undefined') {
+          // Hosted Checkout Link fallback
+          setStep('REDIRECTING');
           window.location.href = data.link;
         } else {
-          setIsSubmitting(false);
-          setStep('WAITING_PAYMENT');
+          setStep('WAITING_DIRECT_PAY');
         }
       } else {
         setIsSubmitting(false);
@@ -162,7 +170,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto font-poppins">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto font-poppins">
         
         {/* Backdrop click to exit */}
         <motion.div
@@ -173,41 +181,41 @@ export const VoteModal: React.FC<VoteModalProps> = ({
           onClick={handleCloseAll}
         />
 
-        {/* Modal Window */}
+        {/* Modal Window in Ultra-Transparent Frosted Glass */}
         <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="relative w-full max-w-lg bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xl z-10 my-8 overflow-hidden text-slate-900"
+          className="relative w-full max-w-lg glass-mirror-panel rounded-[2.5rem] p-6 sm:p-8 border border-white/40 shadow-2xl z-10 my-8 overflow-hidden text-white"
         >
           {/* Top Close Button */}
           <button
             onClick={handleCloseAll}
-            className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-slate-700 bg-slate-100 transition-colors"
+            className="absolute top-4 right-4 p-2 rounded-full text-slate-300 hover:text-white glass-inner-box transition-colors border border-white/20"
           >
             <X className="w-5 h-5" />
           </button>
 
           {step === 'FORM' && (
-            /* Step 1: Form & Pack Selection */
+            /* Step 1: Form & Direct Pay Phone Input */
             <div className="space-y-5 text-center">
               
-              <div className="w-14 h-14 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center mx-auto shadow-sm">
-                <Vote className="w-7 h-7" />
+              <div className="w-14 h-14 rounded-full glass-inner-box text-amber-400 flex items-center justify-center mx-auto shadow-xl border border-white/30">
+                <Vote className="w-7 h-7 text-amber-400" />
               </div>
 
               <div>
-                <h3 className="text-2xl font-black text-slate-900 tracking-wide">
+                <h3 className="text-2xl font-black text-white tracking-wide">
                   Soutenir {candidate.firstName}
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">
-                  1 Vote = <strong className="text-amber-600 font-extrabold">{unitVotePrice} FCFA</strong> • Redirection directe vers le paiement
+                <p className="text-xs text-slate-300 mt-1">
+                  1 Vote = <strong className="text-amber-400 font-extrabold">{unitVotePrice} FCFA</strong> • Direct Pay par Mobile Money
                 </p>
               </div>
 
               {/* Candidate Quick Header */}
-              <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex items-center gap-3 text-left">
-                <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border border-slate-200">
+              <div className="glass-inner-box p-3.5 rounded-2xl border border-white/20 flex items-center gap-3 text-left">
+                <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border border-white/30">
                   <Image
                     src={candidate.photoUrl}
                     alt={candidate.firstName}
@@ -216,21 +224,29 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                   />
                 </div>
                 <div>
-                  <span className="text-[10px] font-extrabold uppercase text-blue-600 font-mono">
+                  <span className="text-[10px] font-extrabold uppercase text-amber-400 font-mono">
                     Candidat {candidate.candidateNumber}
                   </span>
-                  <h4 className="text-base font-extrabold text-slate-900">
+                  <h4 className="text-base font-black text-white">
                     {candidate.firstName} {candidate.lastName}
                   </h4>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-300">
                     {candidate.voteCount.toLocaleString('fr-FR')} votes comptabilisés
                   </p>
                 </div>
               </div>
 
+              {/* Error Alert Box */}
+              {errorMessage && (
+                <div className="bg-rose-500/20 border border-rose-400/40 p-3 rounded-xl text-xs text-rose-200 font-bold flex items-center gap-2 text-left">
+                  <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
               {/* Vote Quantity Package Selection */}
               <div className="space-y-2 text-left">
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                <label className="block text-xs font-black text-slate-200 uppercase tracking-wider">
                   Nombre de votes souhaités :
                 </label>
                 <div className="grid grid-cols-4 gap-2">
@@ -239,10 +255,10 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                       key={count}
                       type="button"
                       onClick={() => setVoteCount(count)}
-                      className={`py-2.5 rounded-xl font-extrabold text-xs transition-all border ${
+                      className={`py-2.5 rounded-xl font-black text-xs transition-all border ${
                         voteCount === count
-                          ? 'gold-gradient-btn text-slate-950 border-amber-500 shadow-md scale-105'
-                          : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                          ? 'gold-gradient-btn text-slate-950 border-white shadow-lg scale-105'
+                          : 'glass-inner-box text-slate-200 border-white/20 hover:bg-white/20'
                       }`}
                     >
                       {count} vote{count > 1 ? 's' : ''}
@@ -256,8 +272,8 @@ export const VoteModal: React.FC<VoteModalProps> = ({
 
               {/* Payment Method Selector */}
               <div className="space-y-2 text-left">
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  Moyen de Débit (Mobile Money) :
+                <label className="block text-xs font-black text-slate-200 uppercase tracking-wider">
+                  Moyen de Débit Direct :
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   {[
@@ -268,45 +284,51 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                       key={method.id}
                       type="button"
                       onClick={() => setPaymentMethod(method.id as any)}
-                      className={`p-3 rounded-xl font-extrabold text-xs flex items-center justify-between border transition-all ${
+                      className={`p-3 rounded-xl font-black text-xs flex items-center justify-between border transition-all ${
                         paymentMethod === method.id
-                          ? 'border-amber-500 bg-amber-50 text-amber-900 shadow-sm ring-2 ring-amber-500/20'
-                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                          ? 'border-amber-400 bg-amber-500/20 text-white shadow-md ring-2 ring-amber-400/40'
+                          : 'glass-inner-box border-white/20 text-slate-300 hover:bg-white/20'
                       }`}
                     >
                       <span>{method.label}</span>
-                      <Smartphone className="w-4 h-4 text-amber-600" />
+                      <Smartphone className="w-4 h-4 text-amber-400" />
                     </button>
                   ))}
                 </div>
 
-                {/* Phone Number Input */}
-                <div className="pt-1">
-                  <input
-                    type="tel"
-                    placeholder="Numéro Mobile Money (ex: 699000000)"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-mono placeholder-slate-400 focus:outline-none focus:border-amber-500"
-                  />
+                {/* Direct Pay Phone Input */}
+                <div className="pt-1.5 space-y-1">
+                  <label className="block text-[11px] font-bold text-amber-400">
+                    Saisissez votre numéro Mobile Money pour recevoir l&apos;invitation de paiement :
+                  </label>
+                  <div className="relative flex items-center">
+                    <span className="absolute left-3 text-xs font-black text-slate-300 font-mono">+237</span>
+                    <input
+                      type="tel"
+                      placeholder="699000000 ou 670000000"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      className="w-full pl-14 pr-3.5 py-3 rounded-xl bg-slate-950/80 border border-white/30 text-white text-xs font-mono font-bold placeholder-slate-400 focus:outline-none focus:border-amber-400"
+                    />
+                  </div>
                 </div>
               </div>
 
               {/* Total Summary */}
-              <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between">
+              <div className="glass-inner-box p-3.5 rounded-2xl border border-white/20 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase">Montant du Débit</p>
-                  <p className="text-xs text-slate-600">{voteCount} vote{voteCount > 1 ? 's' : ''} × {unitVotePrice} FCFA</p>
+                  <p className="text-[10px] text-slate-300 font-black uppercase">Montant Total à Débiter</p>
+                  <p className="text-xs text-slate-300">{voteCount} vote{voteCount > 1 ? 's' : ''} × {unitVotePrice} FCFA</p>
                 </div>
-                <p className="text-2xl font-black text-amber-600 font-mono">
+                <p className="text-2xl font-black text-amber-400 font-mono">
                   {totalPrice.toLocaleString('fr-FR')} FCFA
                 </p>
               </div>
 
               {/* Security Badge */}
-              <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Débit sécurisé Mobile Money</span>
+              <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-300 font-medium">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Paiement Direct Pay Fapshi 100% Sécurisé</span>
               </div>
 
               {/* Action Buttons */}
@@ -315,7 +337,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                   type="button"
                   onClick={handleCloseAll}
                   disabled={isSubmitting}
-                  className="py-3 px-4 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 font-bold text-xs transition-colors"
+                  className="py-3 px-4 rounded-xl glass-inner-box border border-white/20 text-slate-300 hover:text-white font-bold text-xs transition-colors"
                 >
                   Annuler
                 </button>
@@ -323,14 +345,14 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                   type="button"
                   onClick={handleInitiatePayment}
                   disabled={isSubmitting}
-                  className="gold-gradient-btn py-3 px-4 rounded-xl font-extrabold text-xs text-slate-950 shadow-md flex items-center justify-center gap-2"
+                  className="gold-gradient-btn py-3 px-4 rounded-xl font-black text-xs text-slate-950 shadow-xl flex items-center justify-center gap-2 uppercase tracking-wider"
                 >
                   {isSubmitting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
                   ) : (
                     <>
-                      <Sparkles className="w-4 h-4" />
-                      <span>Payer {totalPrice} FCFA</span>
+                      <PhoneCall className="w-4 h-4 text-slate-950" />
+                      <span>Valider ({totalPrice} F)</span>
                     </>
                   )}
                 </button>
@@ -339,33 +361,68 @@ export const VoteModal: React.FC<VoteModalProps> = ({
             </div>
           )}
 
-          {step === 'WAITING_PAYMENT' && (
-            /* Step 2: Redirecting & Polling State */
+          {step === 'WAITING_DIRECT_PAY' && (
+            /* Step 2: Fapshi Direct Pay USSD Prompt Waiting State */
             <div className="space-y-6 text-center py-6">
-              <div className="w-20 h-20 rounded-full bg-amber-50 border-2 border-amber-500 mx-auto flex items-center justify-center text-amber-600 shadow-md">
-                <Loader2 className="w-10 h-10 animate-spin" />
+              <div className="w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-400 mx-auto flex items-center justify-center text-amber-400 shadow-2xl animate-pulse">
+                <PhoneCall className="w-10 h-10 text-amber-400 animate-bounce" />
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-2xl font-black text-slate-900 tracking-wide">
-                  Redirection Vers le Portail de Paiement...
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-black uppercase">
+                  <Smartphone className="w-4 h-4 text-emerald-400" /> Prompt Envoyé au +237 {phoneNumber}
+                </span>
+
+                <h3 className="text-2xl font-black text-white tracking-wide">
+                  Vérifiez Votre Téléphone !
                 </h3>
-                <p className="text-sm text-slate-600 max-w-sm mx-auto">
-                  Veuillez valider le débit de <strong className="text-amber-600">{totalPrice} FCFA</strong> sur la page de paiement pour comptabiliser votre vote.
+                <p className="text-sm text-slate-300 max-w-sm mx-auto leading-relaxed">
+                  Une demande de confirmation de <strong className="text-amber-400">{totalPrice} FCFA</strong> a été envoyée sur votre écran de téléphone.
                 </p>
               </div>
 
-              <div className="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 text-xs text-amber-800 font-semibold flex items-center gap-2 text-left">
-                <ShieldCheck className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                <span>Le vote sera crédité à {candidate.firstName} dès confirmation stricte du débit par l&apos;opérateur.</span>
+              <div className="glass-inner-box p-4 rounded-2xl border border-white/30 text-xs text-slate-200 font-semibold space-y-2 text-left">
+                <div className="flex items-center gap-2 font-black text-amber-400">
+                  <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+                  <span>En attente de la saisie de votre code secret...</span>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-normal">
+                  Saisissez votre code secret Mobile Money sur votre téléphone (ou composez le <strong>*126#</strong> / <strong>#150*50#</strong> si la notification n&apos;apparaît pas).
+                </p>
               </div>
 
               <button
                 type="button"
                 onClick={handleCloseAll}
-                className="py-2.5 px-6 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-bold text-xs"
+                className="py-2.5 px-6 rounded-xl glass-inner-box text-slate-300 hover:text-white font-bold text-xs"
               >
                 Annuler la transaction
+              </button>
+            </div>
+          )}
+
+          {step === 'REDIRECTING' && (
+            /* Step 2-B: Redirecting State */
+            <div className="space-y-6 text-center py-6">
+              <div className="w-20 h-20 rounded-full bg-blue-500/20 border-2 border-blue-400 mx-auto flex items-center justify-center text-blue-400 shadow-2xl">
+                <Loader2 className="w-10 h-10 animate-spin text-blue-400" />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-2xl font-black text-white tracking-wide">
+                  Redirection Vers le Portail de Paiement...
+                </h3>
+                <p className="text-sm text-slate-300 max-w-sm mx-auto">
+                  Veuillez valider le débit de <strong className="text-amber-400">{totalPrice} FCFA</strong> sur la page de paiement.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleCloseAll}
+                className="py-2.5 px-6 rounded-xl glass-inner-box text-slate-300 hover:text-white font-bold text-xs"
+              >
+                Annuler
               </button>
             </div>
           )}
@@ -377,28 +434,28 @@ export const VoteModal: React.FC<VoteModalProps> = ({
               animate={{ scale: 1, opacity: 1 }}
               className="space-y-6 text-center py-4"
             >
-              <div className="w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-500 mx-auto flex items-center justify-center text-emerald-600 shadow-lg animate-bounce">
-                <CheckCircle2 className="w-10 h-10" />
+              <div className="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-400 mx-auto flex items-center justify-center text-emerald-400 shadow-2xl animate-bounce">
+                <CheckCircle2 className="w-10 h-10 text-emerald-400" />
               </div>
 
               <div>
-                <h3 className="text-3xl font-black text-slate-900 tracking-wide">
+                <h3 className="text-3xl font-black text-white tracking-wide">
                   🎉 Vote Comptabilisé !
                 </h3>
-                <p className="text-sm text-slate-600 mt-2 max-w-xs mx-auto">
-                  Le débit de <strong className="text-amber-600">{totalPrice} FCFA</strong> a été confirmé. <strong className="text-blue-600">{voteCount} vote{voteCount > 1 ? 's' : ''}</strong> {voteCount > 1 ? 'ont été ajoutés' : 'a été ajouté'} à {candidate.firstName} {candidate.lastName}.
+                <p className="text-sm text-slate-300 mt-2 max-w-xs mx-auto">
+                  Le débit de <strong className="text-amber-400">{totalPrice} FCFA</strong> a été confirmé. <strong className="text-amber-400">{voteCount} vote{voteCount > 1 ? 's' : ''}</strong> {voteCount > 1 ? 'ont été ajoutés' : 'a été ajouté'} à {candidate.firstName} {candidate.lastName}.
                 </p>
               </div>
 
-              <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-xs text-emerald-700 font-bold flex items-center justify-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Paiement débité & Score mis à jour en direct !</span>
+              <div className="bg-emerald-500/20 p-3 rounded-xl border border-emerald-400/40 text-xs text-emerald-300 font-bold flex items-center justify-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Débit confirmé par Fapshi & Score mis à jour en direct !</span>
               </div>
 
               <button
                 type="button"
                 onClick={handleCloseAll}
-                className="w-full gold-gradient-btn py-3.5 rounded-xl font-extrabold text-sm text-slate-950 shadow-md"
+                className="w-full gold-gradient-btn py-3.5 rounded-xl font-black text-sm text-slate-950 shadow-xl uppercase tracking-wider"
               >
                 Fermer
               </button>
@@ -408,15 +465,15 @@ export const VoteModal: React.FC<VoteModalProps> = ({
           {step === 'FAILED' && (
             /* Step 4: Payment Failed / Cancelled */
             <div className="space-y-6 text-center py-4">
-              <div className="w-16 h-16 rounded-full bg-rose-50 border border-rose-200 mx-auto flex items-center justify-center text-rose-600">
-                <AlertTriangle className="w-8 h-8" />
+              <div className="w-16 h-16 rounded-full bg-rose-500/20 border border-rose-400/40 mx-auto flex items-center justify-center text-rose-400">
+                <AlertTriangle className="w-8 h-8 text-rose-400" />
               </div>
 
               <div>
-                <h3 className="text-2xl font-black text-slate-900">
+                <h3 className="text-2xl font-black text-white">
                   Paiement Non Confirmé
                 </h3>
-                <p className="text-xs text-slate-500 mt-2 max-w-xs mx-auto">
+                <p className="text-xs text-slate-300 mt-2 max-w-xs mx-auto leading-relaxed">
                   {errorMessage || 'Aucun débit n’a été effectué sur votre compte. Le vote n’a pas été comptabilisé.'}
                 </p>
               </div>
@@ -425,14 +482,14 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                 <button
                   type="button"
                   onClick={handleCloseAll}
-                  className="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs"
+                  className="flex-1 py-3 rounded-xl glass-inner-box text-slate-300 hover:text-white font-bold text-xs"
                 >
                   Fermer
                 </button>
                 <button
                   type="button"
                   onClick={() => setStep('FORM')}
-                  className="flex-1 gold-gradient-btn py-3 rounded-xl text-slate-950 font-bold text-xs"
+                  className="flex-1 gold-gradient-btn py-3 rounded-xl text-slate-950 font-black text-xs uppercase"
                 >
                   Réessayer
                 </button>
