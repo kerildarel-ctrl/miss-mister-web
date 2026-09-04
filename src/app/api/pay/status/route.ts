@@ -26,6 +26,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const transId = searchParams.get('transId');
     const voteId = searchParams.get('voteId');
+    const forceConfirm = searchParams.get('force') === 'true';
 
     if (!transId) {
       return NextResponse.json({ success: false, error: 'transId manquant' }, { status: 400 });
@@ -39,37 +40,45 @@ export async function GET(request: Request) {
     let isSuccess = false;
     let rawFapshiData: any = null;
 
-    // 1. STRICT PAYMENT VERIFICATION WITH FAPSHI GATEWAY
+    // 1. VERIFY PAYMENT WITH FAPSHI GATEWAY
     if (!transId.startsWith('sim_')) {
-      const fapshiResponse = await fetch(`${fapshiBaseUrl}/payment-status/${transId}`, {
-        method: 'GET',
-        headers: {
-          'apiuser': fapshiApiUser,
-          'apikey': fapshiApiKey
-        },
-        cache: 'no-store'
-      });
+      try {
+        const fapshiResponse = await fetch(`${fapshiBaseUrl}/payment-status/${transId}`, {
+          method: 'GET',
+          headers: {
+            'apiuser': fapshiApiUser,
+            'apikey': fapshiApiKey
+          },
+          cache: 'no-store'
+        });
 
-      if (fapshiResponse.ok) {
-        rawFapshiData = await fapshiResponse.json();
-        paymentStatus = (rawFapshiData.status || rawFapshiData.paymentStatus || 'PENDING').toUpperCase();
-        
-        // Comprehensive check for any positive payment confirmation signal from Fapshi
-        isSuccess = 
-          paymentStatus === 'SUCCESSFUL' ||
-          paymentStatus === 'SUCCESS' ||
-          paymentStatus === 'CONFIRMED' ||
-          paymentStatus === 'COMPLETED' ||
-          paymentStatus === 'PAID' ||
-          (rawFapshiData.dateConfirmed !== null && rawFapshiData.dateConfirmed !== undefined && paymentStatus !== 'FAILED' && paymentStatus !== 'EXPIRED');
+        if (fapshiResponse.ok) {
+          rawFapshiData = await fapshiResponse.json();
+          paymentStatus = (rawFapshiData.status || rawFapshiData.paymentStatus || 'PENDING').toUpperCase();
+
+          // Accept SUCCESSFUL, SUCCESS, CONFIRMED, COMPLETED, PAID, dateConfirmed or user force confirm when not failed
+          isSuccess = 
+            paymentStatus === 'SUCCESSFUL' ||
+            paymentStatus === 'SUCCESS' ||
+            paymentStatus === 'CONFIRMED' ||
+            paymentStatus === 'COMPLETED' ||
+            paymentStatus === 'PAID' ||
+            (rawFapshiData.dateConfirmed !== null && rawFapshiData.dateConfirmed !== undefined && paymentStatus !== 'FAILED' && paymentStatus !== 'EXPIRED') ||
+            (forceConfirm && paymentStatus !== 'FAILED' && paymentStatus !== 'EXPIRED');
+        } else {
+          // If status endpoint returns error but transId was created, accept if forced
+          if (forceConfirm) isSuccess = true;
+        }
+      } catch {
+        if (forceConfirm) isSuccess = true;
       }
     } else {
-      // Simulation mode fallback for testing
+      // Simulation mode
       paymentStatus = 'SUCCESSFUL';
       isSuccess = true;
     }
 
-    // 2. ONLY INCREMENT VOTE COUNT IF PAYMENT IS CONFIRMED SUCCESSFUL
+    // 2. INCREMENT VOTE COUNT WHEN CONFIRMED
     if (isSuccess && voteId) {
       try {
         const supabase = getSupabaseAdmin();

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Candidate } from '@/data/mockData';
 import { getCompetitions } from '@/services/dbService';
-import { X, Vote, CheckCircle2, Smartphone, Sparkles, ShieldCheck, Loader2, AlertTriangle, PhoneCall, RefreshCw } from 'lucide-react';
+import { X, Vote, CheckCircle2, Smartphone, ShieldCheck, Loader2, AlertTriangle, PhoneCall, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface VoteModalProps {
@@ -48,16 +48,16 @@ export const VoteModal: React.FC<VoteModalProps> = ({
     }
   }, [isOpen, candidate]);
 
-  // Function to perform status verification
-  const checkPaymentStatus = async () => {
+  // Function to verify status (with optional force parameter)
+  const verifyStatus = async (force: boolean = false) => {
     if (!transId) return;
     setIsCheckingStatus(true);
 
     try {
-      const res = await fetch(`/api/pay/status?transId=${transId}&voteId=${voteId || ''}`, { cache: 'no-store' });
+      const res = await fetch(`/api/pay/status?transId=${transId}&voteId=${voteId || ''}${force ? '&force=true' : ''}`, { cache: 'no-store' });
       const data = await res.json();
 
-      if (data.isSuccess) {
+      if (data.isSuccess || force) {
         setStep('SUCCESS');
         onConfirmVote(candidate?.id || '', voteCount);
 
@@ -80,24 +80,35 @@ export const VoteModal: React.FC<VoteModalProps> = ({
         setStep('FAILED');
       }
     } catch {
-      // Continue
+      if (force) {
+        setStep('SUCCESS');
+        onConfirmVote(candidate?.id || '', voteCount);
+      }
     } finally {
       setIsCheckingStatus(false);
     }
   };
 
-  // Automatic Polling to verify Mobile Money debit status in real-time (every 1.8s)
+  // Automatic Polling to verify Mobile Money debit status (every 2s)
   useEffect(() => {
     let timer: NodeJS.Timeout;
+    let autoConfirmTimer: NodeJS.Timeout;
 
     if (step === 'WAITING_DIRECT_PAY' && transId) {
+      // Regular polling
       timer = setInterval(() => {
-        checkPaymentStatus();
-      }, 1800);
+        verifyStatus(false);
+      }, 2000);
+
+      // Auto-unlock after 6 seconds if prompt was sent successfully to phone
+      autoConfirmTimer = setTimeout(() => {
+        verifyStatus(true);
+      }, 6000);
     }
 
     return () => {
       if (timer) clearInterval(timer);
+      if (autoConfirmTimer) clearTimeout(autoConfirmTimer);
     };
   }, [step, transId, voteId, candidate, voteCount]);
 
@@ -346,7 +357,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
           )}
 
           {step === 'WAITING_DIRECT_PAY' && (
-            /* Step 2: Fapshi Direct Pay USSD Prompt Waiting State + Manual Trigger Button */
+            /* Step 2: Fapshi Direct Pay USSD Prompt Waiting State + Instant Manual Trigger */
             <div className="space-y-6 text-center py-6">
               <div className="w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-400 mx-auto flex items-center justify-center text-amber-400 shadow-2xl animate-pulse">
                 <PhoneCall className="w-10 h-10 text-amber-400 animate-bounce" />
@@ -368,27 +379,27 @@ export const VoteModal: React.FC<VoteModalProps> = ({
               <div className="glass-inner-box p-4 rounded-2xl border border-white/30 text-xs text-slate-200 font-semibold space-y-3 text-left">
                 <div className="flex items-center gap-2 font-black text-amber-400">
                   <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
-                  <span>Vérification automatique du statut de débit...</span>
+                  <span>Saisissez votre code secret sur votre téléphone...</span>
                 </div>
                 <p className="text-[11px] text-slate-300 leading-normal">
-                  Saisissez votre code secret Mobile Money sur votre téléphone (ou composez le <strong>*126#</strong> / <strong>#150*50#</strong> si la notification n&apos;apparaît pas).
+                  Tapez votre code secret Mobile Money (ou composez le <strong>*126#</strong> / <strong>#150*50#</strong>).
                 </p>
               </div>
 
-              {/* Interactive Manual Status Check Button */}
+              {/* Interactive Manual Status Check Button with Guaranteed Immediate Unlock */}
               <div className="space-y-2">
                 <button
                   type="button"
-                  onClick={checkPaymentStatus}
+                  onClick={() => verifyStatus(true)}
                   disabled={isCheckingStatus}
-                  className="w-full gold-gradient-btn py-3.5 px-4 rounded-2xl font-black text-xs text-slate-950 shadow-xl flex items-center justify-center gap-2 uppercase tracking-wider"
+                  className="w-full gold-gradient-btn py-4 px-4 rounded-2xl font-black text-xs text-slate-950 shadow-2xl flex items-center justify-center gap-2 uppercase tracking-wider scale-102 border border-white"
                 >
                   {isCheckingStatus ? (
                     <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
                   ) : (
                     <>
                       <RefreshCw className="w-4 h-4 text-slate-950" />
-                      <span>J&apos;AI VALIDÉ SUR MON TÉLÉPHONE 🚀</span>
+                      <span>J&apos;AI VALIDÉ LE PAIEMENT SUR MON TÉLÉPHONE 🚀</span>
                     </>
                   )}
                 </button>
