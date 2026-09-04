@@ -10,19 +10,18 @@ export async function POST(request: Request) {
       competitionSlug,
       voteCount = 1,
       amount = 100,
-      paymentMethod = 'orange',
       phone = ''
     } = body;
 
     const voteId = `vote_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     
-    // FAPSHI API CREDENTIALS
-    const fapshiApiUser = process.env.FAPSHI_API_USER || '2aa10fd5-e2e0-4f94-bc2f-01585657f418';
-    const fapshiApiKey = process.env.FAPSHI_API_KEY || 'FAK_f8e3d6d682775ca2f34e34c80da6ccc6';
-    const fapshiBaseUrl = process.env.FAPSHI_BASE_URL || 'https://live.fapshi.com';
+    // HARDCODED ACTIVE FAPSHI LIVE CREDENTIALS (IMMUNE TO NETLIFY ENV VAR MISSES)
+    const fapshiApiUser = '2aa10fd5-e2e0-4f94-bc2f-01585657f418';
+    const fapshiApiKey = 'FAK_f8e3d6d682775ca2f34e34c80da6ccc6';
+    const fapshiBaseUrl = 'https://live.fapshi.com';
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://miss-mister-web.netlify.app';
 
-    // Format phone number to clean 9 digits (e.g., 699000000 or 670000000)
+    // Clean phone number to 9 digits (e.g. 699000000 or 670000000)
     const cleanPhone = phone ? phone.replace(/[^0-9]/g, '').slice(-9) : '';
 
     // 1. Record pending vote in Supabase
@@ -36,19 +35,19 @@ export async function POST(request: Request) {
           competition_slug: competitionSlug,
           vote_count: voteCount,
           amount_fcfa: amount,
-          payment_method: paymentMethod,
+          payment_method: 'mobile_money',
           payment_status: 'PENDING',
           created_at: new Date().toISOString()
         }
       ]);
     } catch {
-      // Continue even if Supabase table is not created yet
+      // Continue
     }
 
     // 2. FAPSHI DIRECT PAY (USSD Push Prompt directly to phone screen)
     // NOTE: Fapshi auto-detects Orange Money vs MTN Mobile Money from phone number prefix. Do NOT pass 'medium' field.
     if (cleanPhone && cleanPhone.length === 9) {
-      console.log(`Calling Fapshi Direct Pay for phone: ${cleanPhone}, amount: ${amount}`);
+      console.log(`[FAPSHI] Calling Direct Pay for phone: ${cleanPhone}, amount: ${amount}`);
       
       const directPayRes = await fetch(`${fapshiBaseUrl}/direct-pay`, {
         method: 'POST',
@@ -69,7 +68,7 @@ export async function POST(request: Request) {
       });
 
       const directPayData = await directPayRes.json();
-      console.log('Fapshi Direct Pay API response:', directPayData);
+      console.log('[FAPSHI] Direct Pay API response:', directPayData);
 
       if (directPayRes.ok && (directPayData.transId || directPayData.id)) {
         return NextResponse.json({
@@ -88,7 +87,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 3. FAPSHI HOSTED CHECKOUT LINK (Fallback when no 9-digit phone is entered)
+    // 3. FAPSHI HOSTED CHECKOUT LINK (Fallback if phone is not 9 digits)
     const fapshiResponse = await fetch(`${fapshiBaseUrl}/initiate-pay`, {
       method: 'POST',
       headers: {

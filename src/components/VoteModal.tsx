@@ -21,7 +21,6 @@ export const VoteModal: React.FC<VoteModalProps> = ({
   onConfirmVote,
 }) => {
   const [voteCount, setVoteCount] = useState<number>(1);
-  const [paymentMethod, setPaymentMethod] = useState<'orange' | 'mtn'>('orange');
   const [phoneNumber, setPhoneNumber] = useState('');
   
   // Payment Flow States: FORM -> WAITING_DIRECT_PAY / REDIRECTING -> SUCCESS / FAILED
@@ -98,10 +97,12 @@ export const VoteModal: React.FC<VoteModalProps> = ({
 
   const totalPrice = voteCount * unitVotePrice;
 
-  // Initiate Fapshi Direct Pay (USSD Prompt) or Link Fallback
+  // Initiate Fapshi Direct Pay (USSD Prompt directly to user's phone)
   const handleInitiatePayment = async () => {
-    if (!phoneNumber || phoneNumber.trim().length < 9) {
-      setErrorMessage('Veuillez saisir un numéro de téléphone valide à 9 chiffres (ex: 699000000).');
+    const cleanPhone = phoneNumber ? phoneNumber.replace(/[^0-9]/g, '').slice(-9) : '';
+
+    if (!cleanPhone || cleanPhone.length !== 9) {
+      setErrorMessage('Veuillez saisir un numéro de téléphone valide à 9 chiffres (ex: 699000000 ou 670000000).');
       return;
     }
 
@@ -118,8 +119,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
           competitionSlug: candidate.competitionSlug,
           voteCount: voteCount,
           amount: totalPrice,
-          paymentMethod: paymentMethod,
-          phone: phoneNumber
+          phone: cleanPhone
         })
       });
 
@@ -130,7 +130,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
         setVoteId(data.voteId);
         setIsSubmitting(false);
 
-        // Simulation Mode (for testing without live keys)
+        // Simulation Mode
         if (data.transId && data.transId.startsWith('sim_')) {
           setStep('SUCCESS');
           onConfirmVote(candidate.id, voteCount);
@@ -141,7 +141,6 @@ export const VoteModal: React.FC<VoteModalProps> = ({
         if (data.directPay) {
           setStep('WAITING_DIRECT_PAY');
         } else if (data.link && typeof window !== 'undefined') {
-          // Hosted Checkout Link fallback
           setStep('REDIRECTING');
           window.location.href = data.link;
         } else {
@@ -270,48 +269,25 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                 </div>
               </div>
 
-              {/* Payment Method Selector */}
-              <div className="space-y-2 text-left">
-                <label className="block text-xs font-black text-slate-200 uppercase tracking-wider">
-                  Moyen de Débit Direct :
+              {/* Direct Pay Phone Input (Clean & Single Input field) */}
+              <div className="space-y-1.5 text-left">
+                <label className="block text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Smartphone className="w-4 h-4 text-amber-400" />
+                  <span>Numéro Mobile Money (Orange / MTN) :</span>
                 </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { id: 'orange', label: 'Orange Money' },
-                    { id: 'mtn', label: 'MTN Mobile Money' },
-                  ].map((method) => (
-                    <button
-                      key={method.id}
-                      type="button"
-                      onClick={() => setPaymentMethod(method.id as any)}
-                      className={`p-3 rounded-xl font-black text-xs flex items-center justify-between border transition-all ${
-                        paymentMethod === method.id
-                          ? 'border-amber-400 bg-amber-500/20 text-white shadow-md ring-2 ring-amber-400/40'
-                          : 'glass-inner-box border-white/20 text-slate-300 hover:bg-white/20'
-                      }`}
-                    >
-                      <span>{method.label}</span>
-                      <Smartphone className="w-4 h-4 text-amber-400" />
-                    </button>
-                  ))}
+                <div className="relative flex items-center">
+                  <span className="absolute left-3.5 text-xs font-black text-slate-300 font-mono">+237</span>
+                  <input
+                    type="tel"
+                    placeholder="699000000 ou 670000000"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full pl-16 pr-4 py-3.5 rounded-xl bg-slate-950/90 border border-amber-400/50 text-white text-sm font-mono font-black placeholder-slate-400 focus:outline-none focus:border-amber-400 shadow-inner"
+                  />
                 </div>
-
-                {/* Direct Pay Phone Input */}
-                <div className="pt-1.5 space-y-1">
-                  <label className="block text-[11px] font-bold text-amber-400">
-                    Saisissez votre numéro Mobile Money pour recevoir l&apos;invitation de paiement :
-                  </label>
-                  <div className="relative flex items-center">
-                    <span className="absolute left-3 text-xs font-black text-slate-300 font-mono">+237</span>
-                    <input
-                      type="tel"
-                      placeholder="699000000 ou 670000000"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="w-full pl-14 pr-3.5 py-3 rounded-xl bg-slate-950/80 border border-white/30 text-white text-xs font-mono font-bold placeholder-slate-400 focus:outline-none focus:border-amber-400"
-                    />
-                  </div>
-                </div>
+                <p className="text-[10px] text-slate-300 font-medium">
+                  Le système détecte automatiquement Orange Money ou MTN Mobile Money.
+                </p>
               </div>
 
               {/* Total Summary */}
@@ -337,7 +313,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                   type="button"
                   onClick={handleCloseAll}
                   disabled={isSubmitting}
-                  className="py-3 px-4 rounded-xl glass-inner-box border border-white/20 text-slate-300 hover:text-white font-bold text-xs transition-colors"
+                  className="py-3.5 px-4 rounded-xl glass-inner-box border border-white/20 text-slate-300 hover:text-white font-bold text-xs transition-colors"
                 >
                   Annuler
                 </button>
@@ -345,7 +321,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                   type="button"
                   onClick={handleInitiatePayment}
                   disabled={isSubmitting}
-                  className="gold-gradient-btn py-3 px-4 rounded-xl font-black text-xs text-slate-950 shadow-xl flex items-center justify-center gap-2 uppercase tracking-wider"
+                  className="gold-gradient-btn py-3.5 px-4 rounded-xl font-black text-xs text-slate-950 shadow-xl flex items-center justify-center gap-2 uppercase tracking-wider"
                 >
                   {isSubmitting ? (
                     <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
@@ -473,7 +449,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
                 <h3 className="text-2xl font-black text-white">
                   Paiement Non Confirmé
                 </h3>
-                <p className="text-xs text-slate-300 mt-2 max-w-xs mx-auto leading-relaxed">
+                <p className="text-xs text-slate-300 mt-2 max-w-xs mx-auto leading-relaxed font-mono font-bold">
                   {errorMessage || 'Aucun débit n’a été effectué sur votre compte. Le vote n’a pas été comptabilisé.'}
                 </p>
               </div>
