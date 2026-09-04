@@ -48,16 +48,16 @@ export const VoteModal: React.FC<VoteModalProps> = ({
     }
   }, [isOpen, candidate]);
 
-  // Function to verify status (with optional force parameter)
-  const verifyStatus = async (force: boolean = false) => {
+  // Function to verify status
+  const verifyStatus = async () => {
     if (!transId) return;
     setIsCheckingStatus(true);
 
     try {
-      const res = await fetch(`/api/pay/status?transId=${transId}&voteId=${voteId || ''}${force ? '&force=true' : ''}`, { cache: 'no-store' });
+      const res = await fetch(`/api/pay/status?transId=${transId}&voteId=${voteId || ''}&candidateId=${candidate?.id || ''}&count=${voteCount}`, { cache: 'no-store' });
       const data = await res.json();
 
-      if (data.isSuccess || force) {
+      if (data.isSuccess) {
         setStep('SUCCESS');
         onConfirmVote(candidate?.id || '', voteCount);
 
@@ -80,10 +80,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
         setStep('FAILED');
       }
     } catch {
-      if (force) {
-        setStep('SUCCESS');
-        onConfirmVote(candidate?.id || '', voteCount);
-      }
+      // Continue polling
     } finally {
       setIsCheckingStatus(false);
     }
@@ -92,23 +89,18 @@ export const VoteModal: React.FC<VoteModalProps> = ({
   // Automatic Polling to verify Mobile Money debit status (every 2s)
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    let autoConfirmTimer: NodeJS.Timeout;
 
     if (step === 'WAITING_DIRECT_PAY' && transId) {
+      // Immediate initial check
+      verifyStatus();
       // Regular polling
       timer = setInterval(() => {
-        verifyStatus(false);
+        verifyStatus();
       }, 2000);
-
-      // Auto-unlock after 6 seconds if prompt was sent successfully to phone
-      autoConfirmTimer = setTimeout(() => {
-        verifyStatus(true);
-      }, 6000);
     }
 
     return () => {
       if (timer) clearInterval(timer);
-      if (autoConfirmTimer) clearTimeout(autoConfirmTimer);
     };
   }, [step, transId, voteId, candidate, voteCount]);
 
@@ -357,7 +349,7 @@ export const VoteModal: React.FC<VoteModalProps> = ({
           )}
 
           {step === 'WAITING_DIRECT_PAY' && (
-            /* Step 2: Fapshi Direct Pay USSD Prompt Waiting State + Instant Manual Trigger */
+            /* Step 2: Fapshi Direct Pay USSD Prompt Waiting State */
             <div className="space-y-6 text-center py-6">
               <div className="w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-400 mx-auto flex items-center justify-center text-amber-400 shadow-2xl animate-pulse">
                 <PhoneCall className="w-10 h-10 text-amber-400 animate-bounce" />
@@ -365,49 +357,32 @@ export const VoteModal: React.FC<VoteModalProps> = ({
 
               <div className="space-y-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-black uppercase">
-                  <Smartphone className="w-4 h-4 text-emerald-400" /> Prompt Envoyé au +237 {phoneNumber}
+                  <Smartphone className="w-4 h-4 text-emerald-400" /> Demande envoyée au +237 {phoneNumber}
                 </span>
 
                 <h3 className="text-2xl font-black text-white tracking-wide">
                   Vérifiez Votre Téléphone !
                 </h3>
                 <p className="text-sm text-slate-300 max-w-sm mx-auto leading-relaxed">
-                  Une demande de confirmation de <strong className="text-amber-400">{totalPrice} FCFA</strong> a été envoyée sur votre écran de téléphone.
+                  Une demande de confirmation de <strong className="text-amber-400">{totalPrice} FCFA</strong> a été envoyée sur votre téléphone.
                 </p>
               </div>
 
               <div className="glass-inner-box p-4 rounded-2xl border border-white/30 text-xs text-slate-200 font-semibold space-y-3 text-left">
                 <div className="flex items-center gap-2 font-black text-amber-400">
                   <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
-                  <span>Saisissez votre code secret sur votre téléphone...</span>
+                  <span>Vérification automatique en cours...</span>
                 </div>
                 <p className="text-[11px] text-slate-300 leading-normal">
-                  Tapez votre code secret Mobile Money (ou composez le <strong>*126#</strong> / <strong>#150*50#</strong>).
+                  Veuillez taper votre code secret Mobile Money sur votre écran de téléphone (ou composez le <strong>*126#</strong> pour MTN ou <strong>#150*50#</strong> pour Orange).
                 </p>
               </div>
 
-              {/* Interactive Manual Status Check Button with Guaranteed Immediate Unlock */}
-              <div className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => verifyStatus(true)}
-                  disabled={isCheckingStatus}
-                  className="w-full gold-gradient-btn py-4 px-4 rounded-2xl font-black text-xs text-slate-950 shadow-2xl flex items-center justify-center gap-2 uppercase tracking-wider scale-102 border border-white"
-                >
-                  {isCheckingStatus ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
-                  ) : (
-                    <>
-                      <RefreshCw className="w-4 h-4 text-slate-950" />
-                      <span>J&apos;AI VALIDÉ LE PAIEMENT SUR MON TÉLÉPHONE 🚀</span>
-                    </>
-                  )}
-                </button>
-
+              <div className="pt-2">
                 <button
                   type="button"
                   onClick={handleCloseAll}
-                  className="py-2.5 px-6 rounded-xl glass-inner-box text-slate-300 hover:text-white font-bold text-xs border border-white/10"
+                  className="py-2.5 px-6 rounded-xl glass-inner-box text-slate-300 hover:text-white font-bold text-xs border border-white/20"
                 >
                   Annuler la transaction
                 </button>

@@ -26,7 +26,6 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const transId = searchParams.get('transId');
     const voteId = searchParams.get('voteId');
-    const forceConfirm = searchParams.get('force') === 'true';
 
     if (!transId) {
       return NextResponse.json({ success: false, error: 'transId manquant' }, { status: 400 });
@@ -56,21 +55,16 @@ export async function GET(request: Request) {
           rawFapshiData = await fapshiResponse.json();
           paymentStatus = (rawFapshiData.status || rawFapshiData.paymentStatus || 'PENDING').toUpperCase();
 
-          // Accept SUCCESSFUL, SUCCESS, CONFIRMED, COMPLETED, PAID, dateConfirmed or user force confirm when not failed
+          // ONLY explicit successful status codes from Fapshi count as success
           isSuccess = 
             paymentStatus === 'SUCCESSFUL' ||
             paymentStatus === 'SUCCESS' ||
             paymentStatus === 'CONFIRMED' ||
             paymentStatus === 'COMPLETED' ||
-            paymentStatus === 'PAID' ||
-            (rawFapshiData.dateConfirmed !== null && rawFapshiData.dateConfirmed !== undefined && paymentStatus !== 'FAILED' && paymentStatus !== 'EXPIRED') ||
-            (forceConfirm && paymentStatus !== 'FAILED' && paymentStatus !== 'EXPIRED');
-        } else {
-          // If status endpoint returns error but transId was created, accept if forced
-          if (forceConfirm) isSuccess = true;
+            paymentStatus === 'PAID';
         }
-      } catch {
-        if (forceConfirm) isSuccess = true;
+      } catch (err) {
+        console.error('[STATUS API] Fapshi status fetch error:', err);
       }
     } else {
       // Simulation mode
@@ -115,9 +109,20 @@ export async function GET(request: Request) {
             // Update candidate score on server disk JSON
             updateDiskCandidateVote(vote.candidate_id, vote.vote_count || 1);
           }
+        } else if (!vote) {
+          // Fallback if vote record wasn't found in DB
+          const parts = voteId.split('_');
+          if (parts.length >= 2) {
+            // Update disk candidate directly
+            const candidateId = searchParams.get('candidateId');
+            const countStr = searchParams.get('count');
+            if (candidateId) {
+              updateDiskCandidateVote(candidateId, parseInt(countStr || '1', 10));
+            }
+          }
         }
-      } catch {
-        // Fallback
+      } catch (err) {
+        console.error('[STATUS API] DB update error:', err);
       }
     }
 
