@@ -24,7 +24,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#060911]/60 backdrop-blur-2xl border-b border-white/20 font-poppins shadow-2xl">
+    <header className="sticky top-0 z-50 w-full bg-[#060911]/50 backdrop-blur-2xl border-b border-white/20 font-poppins shadow-2xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-2 sm:py-3 min-h-[88px]">
           
@@ -51,7 +51,7 @@ export const Header: React.FC = () => {
             )}
           </Link>
 
-          {/* Desktop Navigation - ULTRA FROSTED GLASS PILLS */}
+          {/* Desktop Navigation in Ultra-Transparent Frosted Glass */}
           <nav className="hidden md:flex items-center gap-2 glass-inner-box p-1.5 rounded-full border border-white/30 shadow-2xl">
             {navLinks.map((link) => {
               const active = isActive(link.href);
@@ -62,7 +62,7 @@ export const Header: React.FC = () => {
                   className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 ${
                     active
                       ? 'gold-gradient-btn text-slate-950 shadow-lg scale-105'
-                      : 'text-slate-200 hover:text-white hover:bg-white/20'
+                      : 'text-slate-200 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   {link.label}
@@ -75,7 +75,7 @@ export const Header: React.FC = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-3 rounded-2xl text-amber-400 glass-inner-box border border-white/30 shadow-xl"
+              className="p-3 rounded-2xl text-amber-400 glass-inner-box border border-white/30 shadow-lg"
               aria-label="Toggle Navigation"
             >
               {isMobileMenuOpen ? <X className="w-7 h-7 text-amber-400" /> : <Menu className="w-7 h-7 text-amber-400" />}
@@ -85,14 +85,14 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Drawer Navigation in Frosted Glass */}
+      {/* Mobile Drawer Navigation in Glass */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-[#060911]/90 backdrop-blur-3xl border-b border-white/20 overflow-hidden shadow-2xl"
+            className="md:hidden bg-[#060911]/80 backdrop-blur-3xl border-b border-white/20 overflow-hidden shadow-2xl"
           >
             <div className="px-4 pt-4 pb-6 space-y-2.5">
               {navLinks.map((link) => {
@@ -104,8 +104,8 @@ export const Header: React.FC = () => {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`block px-5 py-3.5 rounded-2xl text-sm font-black uppercase tracking-wider transition-all ${
                       active
-                        ? 'gold-gradient-btn text-slate-950 shadow-lg'
-                        : 'text-slate-200 hover:bg-white/20 hover:text-amber-400'
+                        ? 'gold-gradient-btn text-slate-950 shadow-md'
+                        : 'text-slate-200 hover:bg-white/10 hover:text-amber-400'
                     }`}
                   >
                     {link.label}
