@@ -10,7 +10,8 @@ import { Countdown } from '@/components/Countdown';
 import { VoteModal } from '@/components/VoteModal';
 import { getCompetitions, getCandidates, submitVote } from '@/services/dbService';
 import { Competition, Candidate } from '@/data/mockData';
-import { Trophy, Search, Users, Vote, Sparkles } from 'lucide-react';
+import { Trophy, Search, Users, Vote, Sparkles, CheckCircle2, Info, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CompetitionDetailPage() {
   const params = useParams();
@@ -24,6 +25,13 @@ export default function CompetitionDetailPage() {
   const [categoryFilter, setCategoryFilter] = useState<'TOUT' | 'Miss' | 'Mister'>('TOUT');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+
+  // Payment Status Banner State
+  const [paymentNotice, setPaymentNotice] = useState<{
+    type: 'success' | 'info' | 'error';
+    title: string;
+    message: string;
+  } | null>(null);
 
   // Fetch live competition and candidates from DB
   useEffect(() => {
@@ -40,6 +48,99 @@ export default function CompetitionDetailPage() {
       setIsLoading(false);
     }
     loadLiveData();
+  }, [slug]);
+
+  // HANDLE POST-PAYMENT REDIRECT FROM FAPSHI GATEWAY
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const voteSuccess = urlParams.get('voteSuccess');
+    const voteId = urlParams.get('voteId');
+    const transId = urlParams.get('transId');
+    const candidateId = urlParams.get('candidateId');
+
+    if (voteSuccess === 'true' || voteId || transId) {
+      let attempts = 0;
+      const maxAttempts = 5;
+
+      const verifyPayment = async () => {
+        try {
+          const res = await fetch(
+            `/api/pay/status?transId=${transId || ''}&voteId=${voteId || ''}&candidateId=${candidateId || ''}`,
+            { cache: 'no-store' }
+          );
+          const data = await res.json();
+
+          if (data.isSuccess) {
+            // Update targeted candidate vote count in local UI state
+            const targetId = data.candidateId || candidateId;
+            const addedVotes = data.voteCount || 1;
+
+            if (targetId) {
+              setCandidates((prev) =>
+                prev.map((c) =>
+                  c.id === targetId ? { ...c, voteCount: (c.voteCount || 0) + (data.alreadyProcessed ? 0 : addedVotes) } : c
+                )
+              );
+            }
+
+            setPaymentNotice({
+              type: 'success',
+              title: '🎉 Vote Confirmé & Comptabilisé !',
+              message: `Votre paiement a été vérifié avec succès. ${addedVotes} vote(s) ont été crédité(s) à votre candidat !`
+            });
+
+            // Trigger celebratory confetti
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const confetti = require('canvas-confetti');
+              confetti({
+                particleCount: 150,
+                spread: 90,
+                origin: { y: 0.5 },
+                colors: ['#F59E0B', '#EC4899', '#3B82F6', '#10B981']
+              });
+            } catch {
+              // Fallback
+            }
+
+            // Clean query string from browser URL address bar
+            window.history.replaceState({}, document.title, window.location.pathname);
+            return true;
+          } else if (data.status === 'PENDING' && attempts < maxAttempts) {
+            attempts++;
+            setPaymentNotice({
+              type: 'info',
+              title: '⏳ Validation du Paiement en cours...',
+              message: 'Confirmation du débit Mobile Money auprès de l’opérateur. Merci de patienter...'
+            });
+            return false;
+          } else {
+            setPaymentNotice({
+              type: 'info',
+              title: '📲 Validation Mobile Money',
+              message: 'Si vous avez validé la transaction (#150*50# ou USSD), le vote sera comptabilisé automatiquement.'
+            });
+            window.history.replaceState({}, document.title, window.location.pathname);
+            return true;
+          }
+        } catch {
+          return true;
+        }
+      };
+
+      const pollInterval = setInterval(async () => {
+        const done = await verifyPayment();
+        if (done || attempts >= maxAttempts) {
+          clearInterval(pollInterval);
+        }
+      }, 3000);
+
+      verifyPayment();
+
+      return () => clearInterval(pollInterval);
+    }
   }, [slug]);
 
   const handleVoteClick = (candidate: Candidate) => {
@@ -111,6 +212,42 @@ export default function CompetitionDetailPage() {
 
       <main className="flex-1 min-h-screen pb-16 font-poppins bg-[#0B0E14] text-white">
         
+        {/* PAYMENT NOTIFICATION BANNER */}
+        <AnimatePresence>
+          {paymentNotice && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className={`w-full py-4 px-4 text-center font-poppins border-b ${
+                paymentNotice.type === 'success'
+                  ? 'bg-emerald-950/90 text-emerald-200 border-emerald-500/40'
+                  : paymentNotice.type === 'error'
+                  ? 'bg-rose-950/90 text-rose-200 border-rose-500/40'
+                  : 'bg-amber-950/90 text-amber-200 border-amber-500/40'
+              }`}
+            >
+              <div className="max-w-4xl mx-auto flex items-center justify-between gap-3 text-left">
+                <div className="flex items-center gap-3">
+                  {paymentNotice.type === 'success' && <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0" />}
+                  {paymentNotice.type === 'info' && <Loader2 className="w-6 h-6 text-amber-400 animate-spin flex-shrink-0" />}
+                  {paymentNotice.type === 'error' && <Info className="w-6 h-6 text-rose-400 flex-shrink-0" />}
+                  <div>
+                    <h4 className="text-sm font-black tracking-wide">{paymentNotice.title}</h4>
+                    <p className="text-xs opacity-90 font-medium">{paymentNotice.message}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setPaymentNotice(null)}
+                  className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-bold text-white transition-colors"
+                >
+                  Fermer
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* HERO BANNER SECTION */}
         <section className="relative w-full h-[320px] sm:h-[420px] bg-slate-950 overflow-hidden">
           <Image

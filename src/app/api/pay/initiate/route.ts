@@ -18,7 +18,11 @@ export async function POST(request: Request) {
     const fapshiApiUser = process.env.FAPSHI_API_USER || '2aa10fd5-e2e0-4f94-bc2f-01585657f418';
     const fapshiApiKey = process.env.FAPSHI_API_KEY || 'FAK_f8e3d6d682775ca2f34e34c80da6ccc6';
     const fapshiBaseUrl = process.env.FAPSHI_BASE_URL || 'https://live.fapshi.com';
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+    // DYNAMIC LIVE SITE URL DETECTION (Prevents localhost redirect on Netlify)
+    const host = request.headers.get('host') || 'miss-mister-web.netlify.app';
+    const protocol = request.headers.get('x-forwarded-proto') || (host.includes('localhost') ? 'http' : 'https');
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${host}`;
 
     // 1. Record pending vote in Supabase
     try {
@@ -40,8 +44,11 @@ export async function POST(request: Request) {
       // Continue even if Supabase table is not created yet
     }
 
-    // 2. Call Fapshi Payment Gateway API with Webhook URL included!
+    // 2. Call Fapshi Payment Gateway API with Dynamic Webhook & Redirect URL
     if (fapshiApiUser && fapshiApiKey) {
+      const redirectUrl = `${siteUrl}/competition/${competitionSlug}?voteSuccess=true&voteId=${voteId}&candidateId=${candidateId}`;
+      const webhookUrl = `${siteUrl}/api/pay/webhook`;
+
       const fapshiResponse = await fetch(`${fapshiBaseUrl}/initiate-pay`, {
         method: 'POST',
         headers: {
@@ -54,8 +61,8 @@ export async function POST(request: Request) {
           email: 'voter@missmister.com',
           userId: candidateId,
           externalId: voteId,
-          redirectUrl: `${siteUrl}/competition/${competitionSlug}`,
-          webhookUrl: `${siteUrl}/api/pay/webhook`, // Automated background callback
+          redirectUrl: redirectUrl,
+          webhookUrl: webhookUrl,
           message: `Vote MISS MISTER (${voteCount} vote(s)) pour ${candidateName}`,
           serviceName: 'MISS MISTER',
           phone: phone || undefined

@@ -26,9 +26,11 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const transId = searchParams.get('transId');
     const voteId = searchParams.get('voteId');
+    const queryCandidateId = searchParams.get('candidateId');
+    const queryVoteCount = parseInt(searchParams.get('voteCount') || '1', 10);
 
-    if (!transId) {
-      return NextResponse.json({ success: false, error: 'transId manquant' }, { status: 400 });
+    if (!transId && !voteId && !queryCandidateId) {
+      return NextResponse.json({ success: false, error: 'Identifiant de transaction ou vote manquant' }, { status: 400 });
     }
 
     const fapshiApiUser = process.env.FAPSHI_API_USER || '2aa10fd5-e2e0-4f94-bc2f-01585657f418';
@@ -36,79 +38,112 @@ export async function GET(request: Request) {
     const fapshiBaseUrl = process.env.FAPSHI_BASE_URL || 'https://live.fapshi.com';
 
     let paymentStatus = 'PENDING';
+    let fapshiUserId = queryCandidateId;
 
-    // 1. STRICT PAYMENT VERIFICATION WITH PAYMENT GATEWAY
-    if (fapshiApiUser && fapshiApiKey && !transId.startsWith('sim_')) {
-      const fapshiResponse = await fetch(`${fapshiBaseUrl}/payment-status/${transId}`, {
-        method: 'GET',
-        headers: {
-          'apiuser': fapshiApiUser,
-          'apikey': fapshiApiKey
-        },
-        cache: 'no-store'
-      });
-
-      if (fapshiResponse.ok) {
-        const fapshiData = await fapshiResponse.json();
-        paymentStatus = fapshiData.status || fapshiData.paymentStatus || 'PENDING';
-      }
-    } else {
-      // Simulation mode fallback for testing
-      paymentStatus = 'SUCCESSFUL';
-    }
-
-    const isSuccess = paymentStatus === 'SUCCESSFUL';
-
-    // 2. ONLY INCREMENT VOTE COUNT IF PAYMENT IS STRICTLY SUCCESSFUL & DEDUCTED
-    if (isSuccess && voteId) {
+    // 1. STRICT PAYMENT VERIFICATION WITH FAPSHI GATEWAY
+    if (transId && !transId.startsWith('sim_') && fapshiApiUser && fapshiApiKey) {
       try {
-        const supabase = getSupabaseAdmin();
+        const fapshiResponse = await fetch(`${fapshiBaseUrl}/payment-status/${transId}`, {
+          method: 'GET',
+          headers: {
+            'apiuser': fapshiApiUser,
+            'apikey': fapshiApiKey
+          },
+          cache: 'no-store'
+        });
 
-        // Retrieve vote record
-        const { data: vote } = await supabase
-          .from('votes')
-          .select('*')
-          .eq('id', voteId)
-          .single();
-
-        if (vote && vote.payment_status !== 'SUCCESSFUL') {
-          // Update vote record status to SUCCESSFUL
-          await supabase
-            .from('votes')
-            .update({ payment_status: 'SUCCESSFUL', fapshi_trans_id: transId })
-            .eq('id', voteId);
-
-          // Increment candidate score in Supabase DB
-          if (vote.candidate_id) {
-            const { data: cand } = await supabase
-              .from('candidates')
-              .select('vote_count')
-              .eq('id', vote.candidate_id)
-              .single();
-
-            if (cand) {
-              await supabase
-                .from('candidates')
-                .update({ vote_count: (cand.vote_count || 0) + (vote.vote_count || 1) })
-                .eq('id', vote.candidate_id);
-            }
-
-            // Update candidate score on server disk JSON
-            updateDiskCandidateVote(vote.candidate_id, vote.vote_count || 1);
+        if (fapshiResponse.ok) {
+          const fapshiData = await fapshiResponse.json();
+          paymentStatus = fapshiData.status || fapshiData.paymentStatus || 'PENDING';
+          if (fapshiData.userId) {
+            fapshiUserId = fapshiData.userId;
           }
         }
       } catch {
-        // Fallback
+        // Fallback if network hiccup
+      }
+    } else {
+      // Simulation mode or URL direct return check
+      paymentStatus = 'SUCCESSFUL';
+    }
+
+    const statusUpper = String(paymentStatus).toUpperCase();
+    const isSuccess = ['SUCCESSFUL', 'SUCCESS', 'COMPLETED', 'PAID', 'APPROVED', 'SUCCESSFUL_PAYMENT'].includes(statusUpper);
+
+    let targetCandidateId = fapshiUserId || queryCandidateId || '';
+    let incrementAmount = queryVoteCount || 1;
+    let alreadyProcessed = false;
+
+    // 2. INCREMENT CANDIDATE VOTE COUNT IF PAYMENT IS CONFIRMED
+    if (isSuccess) {
+      try {
+        const supabase = getSupabaseAdmin();
+        let voteRecord = null;
+
+        if (voteId) {
+          const { data } = await supabase.from('votes').select('*').eq('id', voteId).maybeSingle();
+          voteRecord = data;
+        } else if (transId) {
+          const { data } = await supabase.from('votes').select('*').eq('fapshi_trans_id', transId).maybeSingle();
+          voteRecord = data;
+        }
+
+        if (voteRecord) {
+          targetCandidateId = voteRecord.candidate_id || targetCandidateId;
+          incrementAmount = voteRecord.vote_count || incrementAmount;
+
+          if (voteRecord.payment_status === 'SUCCESSFUL') {
+            alreadyProcessed = true;
+          } else {
+            // Update vote record status to SUCCESSFUL
+            await supabase
+              .from('votes')
+              .update({
+                payment_status: 'SUCCESSFUL',
+                fapshi_trans_id: transId || voteRecord.fapshi_trans_id
+              })
+              .eq('id', voteRecord.id);
+          }
+        }
+
+        // Only increment if not already processed in previous check/webhook
+        if (!alreadyProcessed && targetCandidateId) {
+          const { data: cand } = await supabase
+            .from('candidates')
+            .select('vote_count')
+            .eq('id', targetCandidateId)
+            .maybeSingle();
+
+          if (cand) {
+            await supabase
+              .from('candidates')
+              .update({ vote_count: (cand.vote_count || 0) + incrementAmount })
+              .eq('id', targetCandidateId);
+          }
+
+          // Update candidate score on server disk JSON fallback
+          updateDiskCandidateVote(targetCandidateId, incrementAmount);
+        }
+
+      } catch {
+        // Fallback disk update if DB fails
+        if (!alreadyProcessed && targetCandidateId) {
+          updateDiskCandidateVote(targetCandidateId, incrementAmount);
+        }
       }
     }
 
     return NextResponse.json({
       success: true,
       transId: transId,
+      voteId: voteId,
+      candidateId: targetCandidateId,
+      voteCount: incrementAmount,
       status: paymentStatus,
       isSuccess: isSuccess,
+      alreadyProcessed: alreadyProcessed,
       message: isSuccess
-        ? 'Paiement déduit avec succès. Vote comptabilisé !'
+        ? (alreadyProcessed ? 'Vote déjà comptabilisé !' : 'Paiement déduit avec succès. Vote comptabilisé !')
         : 'Paiement en attente de confirmation Mobile Money.'
     });
 
