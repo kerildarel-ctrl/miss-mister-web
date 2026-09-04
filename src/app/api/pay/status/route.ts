@@ -31,14 +31,14 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, error: 'transId manquant' }, { status: 400 });
     }
 
-    const fapshiApiUser = process.env.FAPSHI_API_USER;
-    const fapshiApiKey = process.env.FAPSHI_API_KEY;
+    const fapshiApiUser = process.env.FAPSHI_API_USER || '2aa10fd5-e2e0-4f94-bc2f-01585657f418';
+    const fapshiApiKey = process.env.FAPSHI_API_KEY || 'FAK_f8e3d6d682775ca2f34e34c80da6ccc6';
     const fapshiBaseUrl = process.env.FAPSHI_BASE_URL || 'https://live.fapshi.com';
 
     let paymentStatus = 'PENDING';
 
     // 1. STRICT PAYMENT VERIFICATION WITH FAPSHI GATEWAY
-    if (fapshiApiUser && fapshiApiKey && !transId.startsWith('sim_')) {
+    if (!transId.startsWith('sim_')) {
       const fapshiResponse = await fetch(`${fapshiBaseUrl}/payment-status/${transId}`, {
         method: 'GET',
         headers: {
